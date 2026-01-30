@@ -182,7 +182,7 @@ jobs:
             patch -p1 < fix_namespace.patch
             patch -p1 < fix_base.patch
             patch -p1 < fix_exec.patch
-          elif [[ "${{ inputs.branch }}" == "SM-A546B-Oneui7" || "${{ inputs.branch }}" == "SM-A546E-Oneui7"]]; then
+          elif [[ "${{ inputs.branch }}" == "SM-A546B-Oneui7" || "${{ inputs.branch }}" == "SM-A546E-Oneui7" ]]; then
             cp "$KERNEL_PATCHES/samsung/${{ inputs.branch }}/"* ./
             patch -p1 < fix_namespace.patch
             patch -p1 < fix_base.patch
