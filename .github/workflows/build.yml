@@ -99,7 +99,7 @@ jobs:
       - name: Add Wild_KSU
         run: |
           cd "$COMMON"
-          curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s stable
+          curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s canary
 
       - name: Getting Wild_KSU Version
         run: |
