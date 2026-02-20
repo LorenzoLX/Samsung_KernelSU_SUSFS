@@ -79,11 +79,6 @@ jobs:
           fi
           DEFCONFIG="$COMMON/arch/arm64/configs/gki_defconfig"
 
-          if [[ "${{ inputs.branch }}" == "SM-S938B-Oneui7" ]]; then
-            SECDEFCONFIG=$COMMON/arch/arm64/configs/gki_sec_defconfig
-            echo "SECDEFCONFIG=$SECDEFCONFIG" >> $GITHUB_ENV
-          fi
-
           echo "ROOT=$ROOT" >> $GITHUB_ENV
           echo "SUSFS4KSU=$SUSFS4KSU" >> $GITHUB_ENV
           echo "KERNEL_PATCHES=$KERNEL_PATCHES" >> $GITHUB_ENV
