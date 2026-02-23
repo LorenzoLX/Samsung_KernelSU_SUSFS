@@ -86,7 +86,6 @@ jobs:
           -> SUSFS ඞ v2.0.0
           -> SUSFS Inline hooks
           -> BBG: https://github.com/vc-teahouse/Baseband-guard
-          -> KPN: Added support for KernelPatch-Next.
 
           🔹 BBG (Baseband-guard)
           - A lightweight LSM (Linux Security Module) for Android kernel
@@ -97,6 +96,7 @@ jobs:
 
           Notes:
           - The only modifications to Samsung Kernels at this time are WKSU and SUSFS. Everything else is left at default settings.
+          - Currently no support for KernelPatch-Next for the time being.
           
           Module: 
           -> https://github.com/sidex15/ksu_module_susfs
