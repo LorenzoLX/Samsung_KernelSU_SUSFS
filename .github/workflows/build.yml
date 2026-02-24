@@ -229,7 +229,7 @@ jobs:
 
          cp "$KERNEL_PATCHES/samsung/min_kdp/min_kdp.c" drivers/min_kdp.c
          echo "obj-y += min_kdp.o" >> drivers/Makefile
-         fi
+         
 
       - name: Add BBG
         run: |          
@@ -280,6 +280,20 @@ jobs:
           CONFIG_TRIM_UNUSED_KSYMS=n
           EOF
            
+          elif [[ "${{ inputs.branch }}" == "SM-S926B-Oneui8" ]]; then
+          cat >> "$COMMON/arch/arm64/configs/s5e9945-bazel_defconfig" << 'EOF'
+          # nuke root protection
+          CONFIG_UH=n
+          CONFIG_UH_RKP=n
+          CONFIG_UH_LKMAUTH=n
+          CONFIG_UH_LKM_BLOCK=n
+          CONFIG_RKP_CFP_JOPP=n
+          CONFIG_RKP_CFP=n
+          CONFIG_SECURITY_DEFEX=n
+          CONFIG_PROCA=n
+          CONFIG_FIVE=n
+          EOF
+
           else
           cat >> "$DEFCONFIG" << 'EOF'
           # nuke root protection
