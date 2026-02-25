@@ -222,11 +222,6 @@ jobs:
          echo "kdp_usecount_dec_and_test" >> $SYMBOL_LIST
          echo "kdp_usecount_inc" >> $SYMBOL_LIST
 
-         PATCH="$KERNEL_PATCHES/samsung/min_kdp/add-min_kdp-symbols.patch"
-         if patch -p1 --dry-run < "$PATCH"; then
-          patch -p1 --no-backup-if-mismatch < $PATCH
-         fi
-
          cp "$KERNEL_PATCHES/samsung/min_kdp/min_kdp.c" drivers/min_kdp.c
          echo "obj-y += min_kdp.o" >> drivers/Makefile
          
