@@ -121,3 +121,5 @@ PayPal: [paypal.me/NgadhnjimHoxha](paypal.me/NgadhnjimHoxha)
 
 Wise: [wise.com/pay/me/ngadhnjimh](wise.com/pay/me/ngadhnjimh)
 
+DM on telegram for crypto donations!
+
