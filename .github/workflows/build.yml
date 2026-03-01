@@ -226,15 +226,15 @@ jobs:
          echo "obj-y += min_kdp.o" >> drivers/Makefile
          
 
-      - name: Add BBG
-        run: |          
-          cd "$COMMON"
-          echo "Adding BBG..."
-          curl -LSs https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
-          echo "CONFIG_BBG=y" >> arch/arm64/configs/gki_defconfig
-          sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }' security/Kconfig
-
-          curl -Ls "https://raw.githubusercontent.com/luigimak/kernel_patches/refs/heads/test/common/bbg_fix_get_link.patch" | patch -p1
+#      - name: Add BBG
+#        run: |          
+#          cd "$COMMON"
+#          echo "Adding BBG..."
+#          curl -LSs https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
+#          echo "CONFIG_BBG=y" >> arch/arm64/configs/gki_defconfig
+#          sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }' security/Kconfig
+#
+#          curl -Ls "https://raw.githubusercontent.com/luigimak/kernel_patches/refs/heads/test/common/bbg_fix_get_link.patch" | patch -p1
 
       - name: Set Kernel Configuration Variables
         run: |
@@ -249,7 +249,7 @@ jobs:
           CONFIG_TMPFS_XATTR=y
           CONFIG_TMPFS_POSIX_ACL=y
 
-          # increase log buffer size
+          # increase log buffer size to show bbg version in wksu homepage
           CONFIG_LOG_BUF_SHIFT=20
           EOF
 
