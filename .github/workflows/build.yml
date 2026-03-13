@@ -68,7 +68,7 @@ jobs:
           SUSFS4KSU="$ROOT/susfs4ksu"
           KERNEL_PATCHES="$ROOT/kernel_patches"
           ANYKERNEL3="$ROOT/AnyKernel3"
-          if [[ "${{ inputs.branch }}" == "SM-A546B-Oneui7" || "${{ inputs.branch }}" == "SM-A546E-Oneui7" ]]; then  
+          if [[ "${{ inputs.branch }}" == "SM-A546B-Oneui7" || "${{ inputs.branch }}" == "SM-A546E-Oneui7" || "${{ inputs.branch }}" == "SM-M146B-Oneui7-ADYJ2" ]]; then  
             COMMON="$CONFIG"
           elif [[ "${{ inputs.branch }}" == "SM-A566B" ]]; then
             COMMON="$CONFIG/kernel-6.6"
@@ -77,7 +77,16 @@ jobs:
           else
             COMMON="$CONFIG/kernel_platform/common"
           fi
-          DEFCONFIG="$COMMON/arch/arm64/configs/gki_defconfig"
+
+          if [[ "${{ inputs.branch }}" == "SM-A546B-Oneui7" ]]; then
+            DEFCONFIG="$COMMON/arch/arm64/configs/s5e8835-a54xnaxx_defconfig"
+          elif [[ "${{ inputs.branch }}" == "SM-A546E-Oneui7" ]]; then
+            DEFCONFIG="$COMMON/arch/arm64/configs/s5e8835-a54xnsxx_defconfig"
+          elif [[ "${{ inputs.branch }}" == "SM-M146B-Oneui7-ADYJ2" ]]; then
+            DEFCONFIG="$COMMON/arch/arm64/configs/s5e8535-m14xnsxx_defconfig"
+          else
+            DEFCONFIG="$COMMON/arch/arm64/configs/gki_defconfig"
+          fi
 
           echo "ROOT=$ROOT" >> $GITHUB_ENV
           echo "SUSFS4KSU=$SUSFS4KSU" >> $GITHUB_ENV
@@ -128,7 +137,7 @@ jobs:
 
           else
               echo "⚠ Not a git repo, using defaults"
-              KSU_VERSION=33177
+              KSU_VERSION=33179
               KSU_GIT_TAG="v3.0.0"
           fi
 
@@ -168,49 +177,6 @@ jobs:
           for p in *.patch; do
            patch -p1 < "$p"
           done
-
-#          # Fix SUSFS rejects
-#          if [[ "${{ inputs.branch }}" == "SM-S928B-Oneui7" || "${{ inputs.branch }}" == "SM-S928B-Oneui8" ]]; then
-#            cp "$KERNEL_PATCHES/samsung/S24U/"* ./
-#            patch -p1 < fix_namespace.patch
-#            patch -p1 < fix_base.patch
-#          elif [[ "${{ inputs.branch }}" == "SM-S918B-Oneui8" ]]; then
-#            cp "$KERNEL_PATCHES/samsung/${{ inputs.branch }}/"* ./
-#            patch -p1 < fix_namespace.patch
-#            patch -p1 < fix_base.patch
-#            patch -p1 < fix_exec.patch
-#          elif [[ "${{ inputs.branch }}" == "SM-X916B" ]]; then
-#            cp "$KERNEL_PATCHES/samsung/${{ inputs.branch }}/"* ./
-#            patch -p1 < fix_namespace.patch
-#            patch -p1 < fix_base.patch
-#            patch -p1 < fix_exec.patch
-#          elif [[ "${{ inputs.branch }}" == "SM-F946N" || "${{ inputs.branch }}" == "SM-F946B-Oneui8" ]]; then
-#            cp "$KERNEL_PATCHES/samsung/SM-F946N/"* ./
-#            patch -p1 < fix_namespace.patch
-#            patch -p1 < fix_base.patch
-#            patch -p1 < fix_exec.patch
-#          elif [[ "${{ inputs.branch }}" == "SM-A546B-Oneui7" || "${{ inputs.branch }}" == "SM-A546E-Oneui7" ]]; then
-#            cp "$KERNEL_PATCHES/samsung/SM-A546B-Oneui7/"* ./
-#            patch -p1 < fix_namespace.patch
-#            patch -p1 < fix_base.patch
-#            patch -p1 < Disable_CRC.patch
-#            patch -p1 < fix_exec.patch
-#            patch -p1 < configLSM.patch
-#          elif [[ "${{ inputs.branch }}" == "SM-A566B" ]]; then
-#            cp "$KERNEL_PATCHES/samsung/${{ inputs.branch }}/"* ./
-#            patch -p1 < fix_namespace.patch
-#            patch -p1 < fix_base.patch
-#            patch -p1 < fix_taskmmu.patch
-#          elif [[ "${{ inputs.branch }}" == "SM-S916B-Oneui8" ]]; then
-#            cp "$KERNEL_PATCHES/samsung/${{ inputs.branch }}/"* ./
-#            patch -p1 < fix_namespace.patch
-#            patch -p1 < fix_base.patch
-#            patch -p1 < fix_exec.patch
-#          elif [[ "${{ inputs.branch }}" == "SM-S926B-Oneui8" ]]; then
-#            cp "$KERNEL_PATCHES/samsung/${{ inputs.branch }}/"* ./
-#            patch -p1 < fix_namespace.patch
-#            patch -p1 < fix_base.patch
-#          fi
 
       - name: Fix WiFi and Bluetooth on Samsung 6.6 GKI devices
         if: ${{ inputs.kernel_version == '6.6' }}
@@ -258,7 +224,7 @@ jobs:
 
           if [[ "${{ inputs.branch }}" == "SM-S938B-Oneui7" ]]; then
            echo "Nothing else needed"
-          elif [[ "${{ inputs.branch }}" == "SM-A546B-Oneui7" || "${{ inputs.branch }}" == "SM-A546E-Oneui7" ]]; then
+          elif [[ "${{ inputs.branch }}" == "SM-A546B-Oneui7" || "${{ inputs.branch }}" == "SM-A546E-Oneui7" || "${{ inputs.branch }}" == "SM-M146B-Oneui7-ADYJ2" ]]; then
           cat >> "$DEFCONFIG" << 'EOF'
           # nuke root protection
           CONFIG_UH=n
@@ -350,7 +316,7 @@ jobs:
           elif [[ "${{ inputs.branch }}" == "SM-X916B" || "${{ inputs.branch }}" == "SM-F946N" || "${{ inputs.branch }}" == "SM-S916B-Oneui8" || "${{ inputs.branch }}" == "SM-S918B-Oneui8" || "${{ inputs.branch }}" == "SM-F946B-Oneui8" || "${{ inputs.branch }}" == "SM-S901E-Oneui8" ]]; then
             chmod +x build_kernel_GKI.sh
             LTO=thin ./build_kernel_GKI.sh || true
-          elif [[ "${{ inputs.branch }}" == "SM-A546B-Oneui7" || "${{ inputs.branch }}" == "SM-A546E-Oneui7" ]]; then
+          elif [[ "${{ inputs.branch }}" == "SM-A546B-Oneui7" || "${{ inputs.branch }}" == "SM-A546E-Oneui7" || "${{ inputs.branch }}" == "SM-M146B-Oneui7-ADYJ2" ]]; then
             sudo apt update
             sudo apt-get install -y libyaml-dev
             LTO=thin ./build_kernel.sh || true
@@ -388,7 +354,7 @@ jobs:
             cp ./$CONFIG/bazel-bin/common/kernel_aarch64/Image "$ANYKERNEL3/Image"
           elif [[ "${{ inputs.branch }}" == "SM-X916B" || "${{ inputs.branch }}" == "SM-F946N" || "${{ inputs.branch }}" == "SM-F946B-Oneui8" || "${{ inputs.branch }}" == "SM-S916B-Oneui8" || "${{ inputs.branch }}" == "SM-S918B-Oneui8" ]]; then
             cp ./out/msm-kalama-kalama-gki/dist/Image "$ANYKERNEL3/Image"
-          elif [[ "${{ inputs.branch }}" == "SM-A546B-Oneui7" || "${{ inputs.branch }}" == "SM-A546E-Oneui7" ]]; then
+          elif [[ "${{ inputs.branch }}" == "SM-A546B-Oneui7" || "${{ inputs.branch }}" == "SM-A546E-Oneui7" || "${{ inputs.branch }}" == "SM-M146B-Oneui7-ADYJ2" ]]; then
             cp ./arch/arm64/boot/Image "$ANYKERNEL3/Image"
           elif [[ "${{ inputs.branch }}" == "SM-A566B" ]]; then
             cp ./kernel-6.6/out/arch/arm64/boot/Image "$ANYKERNEL3/Image"
