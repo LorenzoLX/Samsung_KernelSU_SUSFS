@@ -237,6 +237,8 @@ jobs:
           CONFIG_PROCA=n
           CONFIG_FIVE=n
           CONFIG_RKP=n
+          CONFIG_KDP_NS=n
+          CONFIG_KDP=n
           
           #Force Load Kernel Modules
           CONFIG_MODULES=y
@@ -263,6 +265,8 @@ jobs:
           CONFIG_PROCA=n
           CONFIG_FIVE=n
           CONFIG_RKP=n
+          CONFIG_KDP_NS=n
+          CONFIG_KDP=n
           EOF
 
           else
@@ -278,6 +282,8 @@ jobs:
           CONFIG_PROCA=n
           CONFIG_FIVE=n
           CONFIG_RKP=n
+          CONFIG_KDP_NS=n
+          CONFIG_KDP=n
           EOF
           fi
           
