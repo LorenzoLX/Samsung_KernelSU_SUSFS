@@ -220,10 +220,28 @@ jobs:
 
           # increase log buffer size to show bbg version in wksu homepage
           CONFIG_LOG_BUF_SHIFT=20
+
+          # Enable KPM
+          CONFIG_KALLSYMS=y
+          CONFIG_KALLSYMS_ALL=y
           EOF
 
           if [[ "${{ inputs.branch }}" == "SM-S938B-Oneui7" ]]; then
-           echo "Nothing else needed"
+          cat >> "$COMMON/arch/arm64/configs/gki_sec_defconfig" << 'EOF'
+          #disable KPM securities
+          CONFIG_KDP_NS=n
+          CONFIG_KDP=n
+          CONFIG_KDP_CRED=n
+          CONFIG_TIMA=n
+          CONFIG_TZDEV=n
+          CONFIG_SEC_RESTRICT_ROOTING=n
+          CONFIG_KNOX_KAP=n
+          CONFIG_KNOX_NCM=n
+          CONFIG_SEC_KUNIT=n
+          CONFIG_INTEGRITY=n
+          CONFIG_IMA=n
+          EOF
+          
           elif [[ "${{ inputs.branch }}" == "SM-A546B-Oneui7" || "${{ inputs.branch }}" == "SM-A546E-Oneui7" || "${{ inputs.branch }}" == "SM-M146B-Oneui7-ADYJ2" ]]; then
           cat >> "$DEFCONFIG" << 'EOF'
           # nuke root protection
@@ -237,14 +255,12 @@ jobs:
           CONFIG_PROCA=n
           CONFIG_FIVE=n
           CONFIG_RKP=n
-          CONFIG_KDP_NS=n
-          CONFIG_KDP=n
-
-          #enable KPM
+          
+          #disable KPM securities
           CONFIG_KDP_NS=n
           CONFIG_KDP=n
           CONFIG_KDP_CRED=n
-          CONFIG_TIMA-n
+          CONFIG_TIMA=n
           CONFIG_TZDEV=n
           CONFIG_SEC_RESTRICT_ROOTING=n
           CONFIG_KNOX_KAP=n
@@ -279,11 +295,11 @@ jobs:
           CONFIG_FIVE=n
           CONFIG_RKP=n
           
-          #enable KPM
+          #disable KPM securities
           CONFIG_KDP_NS=n
           CONFIG_KDP=n
           CONFIG_KDP_CRED=n
-          CONFIG_TIMA-n
+          CONFIG_TIMA=n
           CONFIG_TZDEV=n
           CONFIG_SEC_RESTRICT_ROOTING=n
           CONFIG_KNOX_KAP=n
@@ -307,11 +323,11 @@ jobs:
           CONFIG_FIVE=n
           CONFIG_RKP=n
 
-          #enable KPM
+          #disable KPM securities
           CONFIG_KDP_NS=n
           CONFIG_KDP=n
           CONFIG_KDP_CRED=n
-          CONFIG_TIMA-n
+          CONFIG_TIMA=n
           CONFIG_TZDEV=n
           CONFIG_SEC_RESTRICT_ROOTING=n
           CONFIG_KNOX_KAP=n
