@@ -261,6 +261,10 @@ jobs:
           CONFIG_TRUSTED_FOUNDATIONS=n
           CONFIG_STRICT_KERNEL_RWX=n
           CONFIG_STRICT_MODULE_RWX=n
+          CONFIG_DM_VERITY=n
+          CONFIG_DM_VERITY_FEC=n
+          CONFIG_INTEGRITY=n
+          CONFIG_RODATA_FULL_DEFAULT_ENABLED=n
                               
           #Force Load Kernel Modules
           CONFIG_MODULES=y
@@ -306,6 +310,10 @@ jobs:
           CONFIG_TRUSTED_FOUNDATIONS=n
           CONFIG_STRICT_KERNEL_RWX=n
           CONFIG_STRICT_MODULE_RWX=n
+          CONFIG_DM_VERITY=n
+          CONFIG_DM_VERITY_FEC=n
+          CONFIG_INTEGRITY=n
+          CONFIG_RODATA_FULL_DEFAULT_ENABLED=n
           EOF
 
           else
@@ -340,6 +348,10 @@ jobs:
           CONFIG_TRUSTED_FOUNDATIONS=n
           CONFIG_STRICT_KERNEL_RWX=n
           CONFIG_STRICT_MODULE_RWX=n
+          CONFIG_DM_VERITY=n
+          CONFIG_DM_VERITY_FEC=n
+          CONFIG_INTEGRITY=n
+          CONFIG_RODATA_FULL_DEFAULT_ENABLED=n
           EOF
           fi
           
