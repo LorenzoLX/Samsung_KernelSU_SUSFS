@@ -273,8 +273,8 @@ jobs:
           CONFIG_TEE=n
           CONFIG_TRUSTED_FOUNDATIONS=n
           CONFIG_ARCH_OPTIONAL_KERNEL_RWX=y
-          CONFIG_STRICT_KERNEL_RWX=n
-          CONFIG_STRICT_MODULE_RWX=n
+          CONFIG_ARCH_OPTIONAL_KERNEL_RWX_DEFAULT=n
+          CONFIG_ARCH_HAS_STRICT_MODULE_RWX=n
           
           #Force Load Kernel Modules
           CONFIG_MODULES=y
@@ -319,8 +319,8 @@ jobs:
           CONFIG_TEE=n
           CONFIG_TRUSTED_FOUNDATIONS=n
           CONFIG_ARCH_OPTIONAL_KERNEL_RWX=y
-          CONFIG_STRICT_KERNEL_RWX=n
-          CONFIG_STRICT_MODULE_RWX=n
+          CONFIG_ARCH_OPTIONAL_KERNEL_RWX_DEFAULT=n
+          CONFIG_ARCH_HAS_STRICT_MODULE_RWX=n
           EOF
 
           else
@@ -354,8 +354,8 @@ jobs:
           CONFIG_TEE=n
           CONFIG_TRUSTED_FOUNDATIONS=n
           CONFIG_ARCH_OPTIONAL_KERNEL_RWX=y
-          CONFIG_STRICT_KERNEL_RWX=n
-          CONFIG_STRICT_MODULE_RWX=n
+          CONFIG_ARCH_OPTIONAL_KERNEL_RWX_DEFAULT=n
+          CONFIG_ARCH_HAS_STRICT_MODULE_RWX=n
           EOF
           fi
           
