@@ -278,6 +278,7 @@ jobs:
           CONFIG_TRUSTED_FOUNDATIONS=n
           CONFIG_S2MPU=n
           CONFIG_RODATA_FULL_DEFAULT_ENABLED=n
+          CONFIG_DEBUG_RODATA=n
           
           #Force Load Kernel Modules
           CONFIG_MODULES=y
