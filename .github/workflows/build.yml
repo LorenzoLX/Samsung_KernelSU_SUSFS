@@ -123,6 +123,10 @@ jobs:
           cd "$COMMON"
           curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s canary
 
+          cd Wild_KSU
+          git checkout "2f126ac00c57431d533da0a93e2d006e01a14ade"
+
+
       - name: Getting Wild_KSU Version
         run: |
           cd "$COMMON/Wild_KSU/kernel"
