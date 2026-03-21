@@ -277,6 +277,7 @@ jobs:
           CONFIG_TEE=n
           CONFIG_TRUSTED_FOUNDATIONS=n
           CONFIG_S2MPU=n
+          CONFIG_RODATA_FULL_DEFAULT_ENABLED=n
           
           #Force Load Kernel Modules
           CONFIG_MODULES=y
