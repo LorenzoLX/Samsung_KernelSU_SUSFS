@@ -15,13 +15,13 @@ on:
       kernel_version:
         required: true
         type: string
-      SUSFS:
+      susfs:
         required: true
         type: string
-      BBG:
+      bbg:
         required: true
         type: string
-      BBRv3:
+      bbrv3:
         required: true
         type: string
       unicodefix:
@@ -177,7 +177,7 @@ jobs:
           echo "✅ Updated fallback values in $KBUILD"
 
       - name: Apply SUSFS Patches
-        if: inputs.SUSFS == 'yes'
+        if: inputs.susfs == 'yes'
         run: |
           cd "$COMMON"
           # Apply compatibility fixes
@@ -231,7 +231,7 @@ jobs:
          echo "obj-y += min_kdp.o" >> drivers/Makefile         
 
       - name: Add BBG
-        if: inputs.BBG == 'yes'
+        if: inputs.bbg == 'yes'
         run: |          
           cd "$COMMON"
           echo "Adding BBG..."
@@ -259,7 +259,7 @@ jobs:
           fi
 
       - name: Add BBRv3
-        if: inputs.BBRv3 == 'yes'
+        if: inputs.bbrv3 == 'yes'
         run: |  
           cd "$COMMON"
           echo "applying BBRv3"
