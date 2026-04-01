@@ -17,7 +17,7 @@ on:
           - Release
         default: Actions
 
-      SUSFS:
+      susfs:
         description: "Build with SUSFS?"
         required: true
         type: choice
@@ -26,7 +26,7 @@ on:
           - no
         default: yes
 
-      BBG:
+      bbg:
         description: "Build with BBG?"
         required: true
         type: choice
@@ -35,7 +35,7 @@ on:
           - no
         default: yes
 
-      BBRv3:
+      bbrv3:
         description: "Add BBR?"
         required: true
         type: choice
