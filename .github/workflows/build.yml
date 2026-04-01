@@ -15,6 +15,18 @@ on:
       kernel_version:
         required: true
         type: string
+      SUSFS:
+        required: true
+        type: string
+      BBG:
+        required: true
+        type: string
+      BBRv3:
+        required: true
+        type: string
+      unicodefix:
+        required: true
+        type: string
 
 jobs:
   build-samsung-gki:
@@ -110,6 +122,11 @@ jobs:
           cd "$COMMON"
           curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s canary
 
+          cat >> "$DEFCONFIG" << 'EOF'
+          # KernelSU Configuration
+          CONFIG_KSU=y
+          EOF
+
       - name: Getting Wild_KSU Version
         run: |
           cd "$COMMON/Wild_KSU/kernel"
@@ -159,6 +176,7 @@ jobs:
           echo "✅ Updated fallback values in $KBUILD"
 
       - name: Apply SUSFS Patches
+        if: inputs.SUSFS == 'yes'
         run: |
           cd "$COMMON"
           # Apply compatibility fixes
@@ -178,6 +196,11 @@ jobs:
            patch -p1 < "$p"
           done
 
+          cat >> "$DEFCONFIG" << 'EOF'
+          # SUSFS Configuration
+          CONFIG_KSU=y
+          EOF
+          
       - name: Fix WiFi and Bluetooth on Samsung 6.6 GKI devices
         if: ${{ inputs.kernel_version == '6.6' }}
         run: |
@@ -206,6 +229,7 @@ jobs:
          echo "obj-y += min_kdp.o" >> drivers/Makefile         
 
       - name: Add BBG
+        if: inputs.BBG == 'yes'
         run: |          
           cd "$COMMON"
           echo "Adding BBG..."
@@ -213,21 +237,40 @@ jobs:
           echo "CONFIG_BBG=y" >> arch/arm64/configs/gki_defconfig
           sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }' security/Kconfig
 
-          if grep -qxF $'\t\tconst char* symlink_target_link = inode->i_op->get_link(dentry, inode, NULL);' ./Baseband-guard/baseband_guard.c; then
-           echo "Applying BBG get_link fix"
-           patch -p1 --forward < "$KERNEL_PATCHES/experimental/bbg/bbg_fix_get_link.patch"
+#          if grep -qxF $'\t\tconst char* symlink_target_link = inode->i_op->get_link(dentry, inode, NULL);' ./Baseband-guard/baseband_guard.c; then
+#           echo "Applying BBG get_link fix"
+#           patch -p1 --forward < "$KERNEL_PATCHES/experimental/bbg/bbg_fix_get_link.patch"
+#          fi
+
+      - name: Add unicodefix
+        if: inputs.unicodefix == 'yes'
+        run: |  
+          cd "$COMMON"
+          echo "detected kernel version: ${{ inputs.kernel_version }}"
+
+          if [[ ${{ inputs.kernel_version }} == 6.* ]]; then
+           cp "$KERNEL_PATCHES/common/unicode_bypass_fix_6.1+.patch" .
+           patch -p1 < unicode_bypass_fix_6.1+.patch
+          else
+           cp "$KERNEL_PATCHES/common/unicode_bypass_fix_6.1-.patch" .
+           patch -p1 < unicode_bypass_fix_6.1-.patch
           fi
+
+      - name: Add BBRv3
+        if: inputs.BBRv3 == 'yes'
+        run: |  
+          cd "$COMMON"
+          echo "applying BBRv3"
+          curl -L -s https://raw.githubusercontent.com/ahmed-alnassif/GKI-Duchamp/refs/heads/dev/kernel-patches/bbrv3/bbrv3.patch | patch -p1 --forward
 
       - name: Set Kernel Configuration Variables
         run: |
           
           echo "Initializing kernel configuration..."
           cat >> "$DEFCONFIG" << 'EOF'
-          # KernelSU Configuration
-          CONFIG_KSU=y
-          CONFIG_KSU_SUSFS=y
 
           # Mountify Support
+          CONFIG_OVERLAY_FS=y
           CONFIG_TMPFS_XATTR=y
           CONFIG_TMPFS_POSIX_ACL=y
 
