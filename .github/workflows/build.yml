@@ -177,7 +177,7 @@ jobs:
           echo "✅ Updated fallback values in $KBUILD"
 
       - name: Apply SUSFS Patches
-        if: inputs.susfs == 'yes'
+        if: inputs.susfs == 'true'
         run: |
           cd "$COMMON"
           # Apply compatibility fixes
@@ -231,7 +231,7 @@ jobs:
          echo "obj-y += min_kdp.o" >> drivers/Makefile         
 
       - name: Add BBG
-        if: inputs.bbg == 'yes'
+        if: inputs.bbg == 'true'
         run: |          
           cd "$COMMON"
           echo "Adding BBG..."
@@ -245,7 +245,7 @@ jobs:
 #          fi
 
       - name: Add unicodefix
-        if: inputs.unicodefix == 'yes'
+        if: inputs.unicodefix == 'true'
         run: |  
           cd "$COMMON"
           echo "detected kernel version: ${{ inputs.kernel_version }}"
@@ -259,7 +259,7 @@ jobs:
           fi
 
       - name: Add BBRv3
-        if: inputs.bbrv3 == 'yes'
+        if: inputs.bbrv3 == 'true'
         run: |  
           cd "$COMMON"
           echo "applying BBRv3"
