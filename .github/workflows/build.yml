@@ -263,6 +263,18 @@ jobs:
           echo "applying BBRv3"
           curl -L -s https://raw.githubusercontent.com/ahmed-alnassif/GKI-Duchamp/refs/heads/dev/kernel-patches/bbrv3/bbrv3.patch | patch -p1 --forward
 
+          cat >> "$DEFCONFIG" << 'EOF'
+          # Networking extras
+          CONFIG_IP_NF_TARGET_TTL=y
+          CONFIG_NET_SCH_FQ=y
+          CONFIG_TCP_CONG_ADVANCED=y
+          CONFIG_DEFAULT_BBR=y
+          CONFIG_TCP_CONG_BBR=y
+          CONFIG_TCP_CONG_WESTWOOD=y
+          CONFIG_IP6_NF_TARGET_HL=y
+          CONFIG_IP6_NF_MATCH_HL=y
+          EOF
+
       - name: Set Kernel Configuration Variables
         run: |
           
