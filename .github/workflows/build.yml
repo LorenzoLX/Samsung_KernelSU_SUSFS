@@ -122,6 +122,7 @@ jobs:
           cd "$COMMON"
           curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s canary
 
+          cd ..
           cat >> "$DEFCONFIG" << 'EOF'
           # KernelSU Configuration
           CONFIG_KSU=y
