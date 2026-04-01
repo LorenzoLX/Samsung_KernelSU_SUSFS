@@ -187,8 +187,25 @@ jobs:
           cp "$SUSFS4KSU/kernel_patches/include/linux/"* ./include/linux/
           cp "$SUSFS4KSU/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch" ./          
 
+          #Prepare open.c for susfs patching
+          sed -i '/#ifdef CONFIG_SECURITY_DEFEX/,/^#endif/d' fs/open.c
+
+          #Prepare namespace.c for susfs patching
+          perl -0777 -i -pe '
+          s/#include <linux\/fslog\.h>\n#ifdef CONFIG_KDP_NS\n#include <linux\/kdp\.h>\n#endif\n//;
+          s/(#include <linux\/sched\/task\.h>\n)/$1#include <linux\/fslog.h>\n#ifdef CONFIG_KDP_NS\n#include <linux\/kdp.h>\n#endif\n/;
+          ' fs/namespace.c
+
+          sed -i '/copy_flags = CL_COPY_UNBINDABLE | CL_EXPIRE;/,/#endif/ {
+            /#ifdef CONFIG_KDP_NS/,/#endif/ {
+              /#else/,/#endif/!d
+              /#else/d
+              /#endif/d
+            }
+          }' fs/namespace.c
+          
           # Apply SUSFS core patch
-          curl -L -s https://raw.githubusercontent.com/Enginex0/Super-Builders/refs/heads/main/android14-6.1/samsung-fixes/SM-S928B/fix_namespace_context.patch | patch -p1 --forward
+          #curl -L -s https://raw.githubusercontent.com/Enginex0/Super-Builders/refs/heads/main/android14-6.1/samsung-fixes/SM-S928B/fix_namespace_context.patch | patch -p1 --forward
           patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
           #rm -rf 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch
           #cp "$KERNEL_PATCHES/samsung/${{ inputs.branch }}/"* ./
