@@ -237,7 +237,8 @@ jobs:
           cd "$COMMON"
           cp "$SUSFS4KSU/kernel_patches/fs/"* ./fs/
           cp "$SUSFS4KSU/kernel_patches/include/linux/"* ./include/linux/
-          cp "$ZEROMOUNT/${{ inputs.android_version }}-${{ inputs.kernel_version }}/WildKSU/patches/"*.patch .
+          cp "$SUSFS4KSU/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch" ./
+          cp "$ZEROMOUNT/${{ inputs.android_version }}-${{ inputs.kernel_version }}/WildKSU/patches/60_zeromount-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch" .
 
           #Prepare open.c for susfs patching
           sed -i '/#ifdef CONFIG_SECURITY_DEFEX/,/^#endif/d' fs/open.c
@@ -252,6 +253,7 @@ jobs:
           }' fs/namespace.c
 
           patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          rm -rf 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch
 
           if [ -d "$KERNEL_PATCHES/samsung/${{ inputs.branch }}" ]; then
            echo "Directory exists, applying fixes"
@@ -266,9 +268,9 @@ jobs:
            echo "No directory found, skipping"
           fi
           
-          # patch -p1 < 51_enhanced_susfs_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          #patch -p1 < 51_enhanced_susfs_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
           patch -p1 < 60_zeromount-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-          patch -p1 < 70_ksu_safety-wksu-${{ inputs.kernel_version }}.patch || true
+          #patch -p1 < 70_ksu_safety-wksu-${{ inputs.kernel_version }}.patch || true
 
           cd "$GITHUB_WORKSPACE"
           cat >> "$DEFCONFIG" << 'EOF'
