@@ -237,7 +237,7 @@ jobs:
           cd "$COMMON"
           cp "$SUSFS4KSU/kernel_patches/fs/"* ./fs/
           cp "$SUSFS4KSU/kernel_patches/include/linux/"* ./include/linux/
-          cp "$ZEROMOUNT/${{ inputs.android_version }}-${{ inputs.kernel_version }}/WildKSU/patches/"* .
+          cp "$ZEROMOUNT/${{ inputs.android_version }}-${{ inputs.kernel_version }}/WildKSU/patches/"*.patch .
 
           #Prepare open.c for susfs patching
           sed -i '/#ifdef CONFIG_SECURITY_DEFEX/,/^#endif/d' fs/open.c
