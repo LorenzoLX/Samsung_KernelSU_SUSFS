@@ -35,6 +35,15 @@ on:
           - no
         default: yes
 
+      zeromount:
+        description: "Add Zeromount?"
+        required: true
+        type: choice
+        options:
+          - yes
+          - no
+        default: no
+
       bbrv3:
         description: "Add BBR?"
         required: true
@@ -73,6 +82,7 @@ jobs:
       bbrv3: ${{ inputs.bbrv3 }}
       unicodefix: ${{ inputs.unicodefix }}
       optimizations: ${{ inputs.optimizations }}
+      zeromount: ${{ inputs.zeromount }}
 
   release:
     runs-on: ubuntu-latest
