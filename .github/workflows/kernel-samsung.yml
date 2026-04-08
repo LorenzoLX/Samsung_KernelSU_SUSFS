@@ -22,6 +22,9 @@ on:
       optimizations:
         required: true
         type: string
+      zeromount:
+        required: true
+        type: string
 
 jobs:
   build-kernels-a12:
@@ -99,4 +102,5 @@ jobs:
       bbrv3: ${{ inputs.bbrv3 }}
       unicodefix: ${{ inputs.unicodefix }}
       optimizations: ${{ inputs.optimizations }}
+      zeromount: ${{ inputs.zeromount }}
 
