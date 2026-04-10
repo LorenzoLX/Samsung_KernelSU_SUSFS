@@ -21,13 +21,7 @@ on:
       bbg:
         required: true
         type: string
-      bbrv3:
-        required: true
-        type: string
       unicodefix:
-        required: true
-        type: string
-      optimizations:
         required: true
         type: string
       zeromount:
@@ -186,7 +180,7 @@ jobs:
           echo "✅ Updated fallback values in $KBUILD"
 
       - name: Apply SUSFS Patches
-        if: inputs.susfs == 'true' && inputs.zeromount == 'false'
+        if: inputs.susfs == 'true'
         run: |
           cd "$COMMON"
           # Apply compatibility fixes
@@ -211,7 +205,7 @@ jobs:
           # Apply SUSFS core patch
           patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
           rm -rf 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch
-
+          
           if [ -d "$KERNEL_PATCHES/samsung/${{ inputs.branch }}" ]; then
            echo "Directory exists, applying fixes"
            cp "$KERNEL_PATCHES/samsung/${{ inputs.branch }}/"*.patch ./
@@ -231,79 +225,47 @@ jobs:
           CONFIG_KSU_SUSFS=y
           EOF
 
-      - name: Apply zeromount Patches
-        if: inputs.susfs == 'false' && inputs.zeromount == 'true'
-        run: |
-          cd "$COMMON"
-          cp "$SUSFS4KSU/kernel_patches/fs/"* ./fs/
-          cp "$SUSFS4KSU/kernel_patches/include/linux/"* ./include/linux/
-          cp "$SUSFS4KSU/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch" ./
+          if [[ ${{ inputs.zeromount }} == 'true' ]]; then
 
-          #Prepare open.c for susfs patching
-          sed -i '/#ifdef CONFIG_SECURITY_DEFEX/,/^#endif/d' fs/open.c
+            echo "adding zeromount..."
+          
+            cp "$ZEROMOUNT/${{ inputs.android_version }}-${{ inputs.kernel_version }}/WildKSU/patches/60_zeromount-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch" .
+            #patch -p1 < 51_enhanced_susfs_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+            patch -p1 < 60_zeromount-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+            rm -rf 60_zeromount-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch
 
-          #Prepare namespace.c for susfs patching
-          sed -i '/copy_flags = CL_COPY_UNBINDABLE | CL_EXPIRE;/,/#endif/ {
-            /#ifdef CONFIG_KDP_NS/,/#endif/ {
-              /#else/,/#endif/!d
-              /#else/d
-              /#endif/d
-            }
-          }' fs/namespace.c
+            if [ -f fs/proc/task_mmu.c ]; then
+              echo "Fixing task_mmu.c..."
 
-          patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-          rm -rf 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch
-
-          if [ -d "$KERNEL_PATCHES/samsung/${{ inputs.branch }}" ]; then
-           echo "Directory exists, applying fixes"
-           cp "$KERNEL_PATCHES/samsung/${{ inputs.branch }}/"*.patch ./
-
-           # Fix SUSFS rejects
-           for p in *.patch; do
-            patch -p1 < "$p"
-            rm -f "$p"
-           done
-          else
-           echo "No directory found, skipping"
-          fi
-
-          cp "$ZEROMOUNT/${{ inputs.android_version }}-${{ inputs.kernel_version }}/WildKSU/patches/60_zeromount-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch" .
-          #patch -p1 < 51_enhanced_susfs_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-          patch -p1 < 60_zeromount-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-          rm -rf 60_zeromount-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch
-
-          if [ -f fs/proc/task_mmu.c ]; then
-            echo "Fixing task_mmu.c..."
-
-            sed -i '/pgoff = ((loff_t)vma->vm_pgoff) << PAGE_SHIFT;/a\
-            #ifdef CONFIG_ZEROMOUNT\
-            \tzeromount_spoof_mmap_metadata(inode, \&dev, \&ino);\
-            #endif' fs/proc/task_mmu.c
-          fi
-
-          if [ -f fs/stat.c.rej ]; then
-          echo "fixing stat.c."
-
-            if ! grep -q 'zeromount_stat_hook(dfd, filename, stat, request_mask, flags)' fs/stat.c; then
-              perl -0pi -e 's@(static int vfs_statx\(.*?\)\s*\{.*?orig_flow:\n#endif\n)@$1\n#ifdef CONFIG_ZEROMOUNT\n\tif (filename) {\n\t\tint zm_ret = zeromount_stat_hook(dfd, filename, stat, request_mask, flags);\n\t\tif (zm_ret != -ENOENT)\n\t\t\treturn zm_ret;\n\t}\n#endif\n\n@s' fs/stat.c
+              sed -i '/pgoff = ((loff_t)vma->vm_pgoff) << PAGE_SHIFT;/a\
+              #ifdef CONFIG_ZEROMOUNT\
+              \tzeromount_spoof_mmap_metadata(inode, \&dev, \&ino);\
+              #endif' fs/proc/task_mmu.c
             fi
-          fi
 
-          if [ -f fs/Kconfig.rej ]; then
-            echo "Applying Kconfig zeromount fix..."
+            if [ -f fs/stat.c.rej ]; then
+            echo "fixing stat.c."
 
-            if ! grep -q '^config ZEROMOUNT$' fs/Kconfig; then
-                perl -0pi -e 's@(config IO_WQ\n\tbool\n)@\1\nconfig ZEROMOUNT\n\tbool "ZeroMount Path Redirection Subsystem"\n\tdefault y\n\thelp\n\t  ZeroMount allows path redirection and virtual file injection\n\t  without mounting filesystems. Useful for systemless modifications.\n\n@' fs/Kconfig
+              if ! grep -q 'zeromount_stat_hook(dfd, filename, stat, request_mask, flags)' fs/stat.c; then
+                perl -0pi -e 's@(static int vfs_statx\(.*?\)\s*\{.*?orig_flow:\n#endif\n)@$1\n#ifdef CONFIG_ZEROMOUNT\n\tif (filename) {\n\t\tint zm_ret = zeromount_stat_hook(dfd, filename, stat, request_mask, flags);\n\t\tif (zm_ret != -ENOENT)\n\t\t\treturn zm_ret;\n\t}\n#endif\n\n@s' fs/stat.c
+              fi
             fi
-          fi
-          #patch -p1 < 70_ksu_safety-wksu-${{ inputs.kernel_version }}.patch || true
 
-          cd "$GITHUB_WORKSPACE"
-          cat >> "$DEFCONFIG" << 'EOF'
-          # SUSFS Configuration
-          CONFIG_KSU_SUSFS=y
-          CONFIG_ZEROMOUNT=y
-          EOF
+            if [ -f fs/Kconfig.rej ]; then
+              echo "Applying Kconfig zeromount fix..."
+
+              if ! grep -q '^config ZEROMOUNT$' fs/Kconfig; then
+                  perl -0pi -e 's@(config IO_WQ\n\tbool\n)@\1\nconfig ZEROMOUNT\n\tbool "ZeroMount Path Redirection Subsystem"\n\tdefault y\n\thelp\n\t  ZeroMount allows path redirection and virtual file injection\n\t  without mounting filesystems. Useful for systemless modifications.\n\n@' fs/Kconfig
+              fi
+            fi
+            #patch -p1 < 70_ksu_safety-wksu-${{ inputs.kernel_version }}.patch || true
+
+            cd "$GITHUB_WORKSPACE"
+            cat >> "$DEFCONFIG" << 'EOF'
+            # Zeromount Configuration
+            CONFIG_ZEROMOUNT=y
+            EOF
+          fi
           
       - name: Fix WiFi and Bluetooth on Samsung 6.6 GKI devices
         if: ${{ inputs.kernel_version == '6.6' }}
@@ -372,50 +334,6 @@ jobs:
            cp "$KERNEL_PATCHES/common/unicode_bypass_fix_6.1-.patch" .
            patch -p1 < unicode_bypass_fix_6.1-.patch
           fi
-
-      - name: Add BBRv3
-        if: inputs.bbrv3 == 'true'
-        run: |  
-          cd "$COMMON"
-          echo "applying BBRv3"
-          curl -L -s https://raw.githubusercontent.com/ahmed-alnassif/GKI-Duchamp/refs/heads/dev/kernel-patches/bbrv3/bbrv3.patch | patch -p1 --forward
-
-          cd "$GITHUB_WORKSPACE"
-          cat >> "$DEFCONFIG" << 'EOF'
-          # Networking extras
-          CONFIG_IP_NF_TARGET_TTL=y
-          CONFIG_NET_SCH_FQ=y
-          CONFIG_TCP_CONG_ADVANCED=y
-          CONFIG_DEFAULT_BBR=y
-          CONFIG_TCP_CONG_BBR=y
-          CONFIG_TCP_CONG_WESTWOOD=y
-          CONFIG_IP6_NF_TARGET_HL=y
-          CONFIG_IP6_NF_MATCH_HL=y
-          EOF
-
-      - name: Add Optimizations
-        if: inputs.optimizations == 'true'
-        run: |  
-          echo "Adding Optimizations..."
-          cat >> "$DEFCONFIG" << 'EOF'
-          # Better I/O & filesystem performance
-          CONFIG_SWAP=y
-          CONFIG_BLK_DEV_ZRAM=y
-          CONFIG_ZRAM_DEF_COMP_LZ4=y
-          CONFIG_ZRAM_WRITEBACK=y
-          CONFIG_ZRAM_MEMORY_TRACKING=y
-          # Modern I/O scheduler
-          CONFIG_MQ_IOSCHED_DEADLINE=y
-          CONFIG_DEFAULT_DEADLINE=y
-          # F2FS optimizations
-          CONFIG_F2FS_FS=y
-          CONFIG_F2FS_FS_XATTR=y
-          CONFIG_F2FS_FS_POSIX_ACL=y
-          CONFIG_F2FS_FS_COMPRESSION=y
-          # Memory management improvements
-          CONFIG_LRU_GEN=y
-          CONFIG_LRU_GEN_ENABLED=y
-          EOF
 
       - name: Set Kernel Configuration Variables
         run: |
