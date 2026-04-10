@@ -17,6 +17,15 @@ on:
           - Release
         default: Actions
 
+      wksu:
+        description: "Build with WKSU?"
+        required: true
+        type: choice
+        options:
+          - yes
+          - no
+        default: yes
+
       susfs:
         description: "Build with SUSFS?"
         required: true
@@ -63,6 +72,7 @@ jobs:
       bbg: ${{ inputs.bbg }}
       unicodefix: ${{ inputs.unicodefix }}
       zeromount: ${{ inputs.zeromount }}
+      wksu: ${{ inputs.wksu }}
 
   release:
     runs-on: ubuntu-latest
