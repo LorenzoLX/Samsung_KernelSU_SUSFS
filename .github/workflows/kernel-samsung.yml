@@ -13,13 +13,7 @@ on:
       bbg:
         required: true
         type: string
-      bbrv3:
-        required: true
-        type: string
       unicodefix:
-        required: true
-        type: string
-      optimizations:
         required: true
         type: string
       zeromount:
@@ -99,8 +93,6 @@ jobs:
       branch: ${{ matrix.branch }}
       susfs: ${{ inputs.susfs }}
       bbg: ${{ inputs.bbg }}
-      bbrv3: ${{ inputs.bbrv3 }}
       unicodefix: ${{ inputs.unicodefix }}
-      optimizations: ${{ inputs.optimizations }}
       zeromount: ${{ inputs.zeromount }}
 
