@@ -43,16 +43,7 @@ on:
           - yes
           - no
         default: no
-
-      bbrv3:
-        description: "Add BBR?"
-        required: true
-        type: choice
-        options:
-          - yes
-          - no
-        default: no
-
+        
       unicodefix:
         description: "Add unicode fix?"
         required: true
@@ -62,15 +53,6 @@ on:
           - no
         default: yes
 
-      optimizations:
-        description: "Add kernel optimizations?"
-        required: true
-        type: choice
-        options:
-          - yes
-          - no
-        default: no
-
 jobs:
 
   build-samsung:
@@ -79,9 +61,7 @@ jobs:
     with:
       susfs: ${{ inputs.susfs }}
       bbg: ${{ inputs.bbg }}
-      bbrv3: ${{ inputs.bbrv3 }}
       unicodefix: ${{ inputs.unicodefix }}
-      optimizations: ${{ inputs.optimizations }}
       zeromount: ${{ inputs.zeromount }}
 
   release:
@@ -92,7 +72,7 @@ jobs:
 
     env:
       GH_TOKEN: ${{ github.token }}
-      RELEASE_NAME: "Samsung GKI Kernels With WKSU v3.0.0 & SUSFS v2.0.0"
+      RELEASE_NAME: "Samsung GKI Kernels With WKSU v3.1.2 & SUSFS v2.1.0"
       RELEASE_BODY: ""
     steps:
       - name: Free Disk Space
