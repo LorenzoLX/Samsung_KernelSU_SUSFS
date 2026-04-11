@@ -62,6 +62,15 @@ on:
           - no
         default: yes
 
+      droidspace:
+        description: "add droidspace support?"
+        required: true
+        type: choice
+        options:
+          - yes
+          - no
+        default: no
+
 jobs:
 
   build-samsung:
@@ -73,6 +82,7 @@ jobs:
       unicodefix: ${{ inputs.unicodefix }}
       zeromount: ${{ inputs.zeromount }}
       wksu: ${{ inputs.wksu }}
+      droidspace: ${{ inputs.droidspace }}
 
   release:
     runs-on: ubuntu-latest
