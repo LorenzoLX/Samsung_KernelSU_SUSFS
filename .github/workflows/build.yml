@@ -224,6 +224,7 @@ jobs:
            echo "No directory found, skipping"
           fi
           
+          cd "$GITHUB_WORKSPACE"
           echo "# SUSFS Configuration" >> "$DEFCONFIG"
           echo "CONFIG_KSU_SUSFS=y" >> "$DEFCONFIG"
           
