@@ -263,11 +263,11 @@ jobs:
             fi
             #patch -p1 < 70_ksu_safety-wksu-${{ inputs.kernel_version }}.patch || true
 
-            cd "$GITHUB_WORKSPACE"
-            cat >> "$DEFCONFIG" << 'EOF'
-            # Zeromount Configuration
-            CONFIG_ZEROMOUNT=y
-            EOF
+          cd "$GITHUB_WORKSPACE"
+          cat >> "$DEFCONFIG" << 'EOF'
+          # Zeromount Configuration
+          CONFIG_ZEROMOUNT=y
+          EOF
           fi
           
       - name: Fix WiFi and Bluetooth on Samsung 6.6 GKI devices
