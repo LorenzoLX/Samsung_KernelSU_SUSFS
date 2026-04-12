@@ -91,7 +91,7 @@ jobs:
           KERNEL_PATCHES="$ROOT/kernel_patches"
           ANYKERNEL3="$ROOT/AnyKernel3"
           ZEROMOUNT="$ROOT/Super-Builders"
-          if [[ ${{ inputs.branch }} == SM-A546* || "${{ inputs.branch }}" == "SM-M146B-Oneui7-ADYJ2" || "${{ inputs.branch }}" == "SM-M556B-Oneui8" ]]; then  
+          if [[ ${{ inputs.branch }} == SM-A546* || "${{ inputs.branch }}" == "SM-M146B-Oneui7-ADYJ2" ]]; then  
             COMMON="$CONFIG"
           elif [[ "${{ inputs.branch }}" == "SM-A566B" ]]; then
             COMMON="$CONFIG/kernel-6.6"
@@ -226,10 +226,14 @@ jobs:
              fi
 
            # Fix SUSFS rejects
-           for p in *.patch; do
-            patch -p1 < "$p"
-            rm -f "$p"
-           done
+           shopt -s nullglob
+
+          for p in *.patch; do
+             patch -p1 < "$p"
+              rm -f "$p"
+          done
+
+          shopt -u nullglob
           else
            echo "No directory found, skipping"
           fi
