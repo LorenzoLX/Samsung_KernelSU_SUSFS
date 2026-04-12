@@ -169,7 +169,7 @@ jobs:
 
           else
               echo "⚠ Not a git repo, using defaults"
-              KSU_VERSION=33212
+              KSU_VERSION=33219
               KSU_GIT_TAG="v3.1.2"
           fi
 
