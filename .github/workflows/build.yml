@@ -386,8 +386,31 @@ jobs:
           EOF
 
           if [[ "${{ inputs.branch }}" == "SM-S938B-Oneui7" || "${{ inputs.branch }}" == "SM-S931B-Oneui8" ]]; then
-          echo "nothing needs to be done"
-           
+          cat >> "$COMMON/arch/arm64/configs/gki_sec_defconfig" << 'EOF'
+          # nuke root protection
+          # CONFIG_KNOX_NCM is not set
+          # CONFIG_DDAR is not set
+          # CONFIG_UH is not set
+          # CONFIG_UH_RKP is not set
+          # CONFIG_UH_LKMAUTH is not set
+          # CONFIG_UH_LKM_BLOCK is not set
+          # CONFIG_RKP is not set
+          # CONFIG_RKP_CFP_JOPP is not set
+          # CONFIG_RKP_CFP is not set
+          # CONFIG_KDP is not set
+          # CONFIG_FIVE is not set
+          # CONFIG_PROCA is not set
+          # CONFIG_PROCA_S_OS is not set
+          # CONFIG_FIVE_TEE_DRIVER is not set
+          # CONFIG_FIVE_PA_FEATURE is not set
+          #CONFIG_FIVE_GKI_10 is not set
+          #CONFIG_PROCA_GKI_10 is not set
+          # CONFIG_SECURITY_DEFEX is not set
+          # CONFIG_SECURITY_DEFEX_USER is not set
+          # CONFIG_SECURITY_DEFEX_DTM is not set
+          # CONFIG_SECURITY_DEFEX_IMR is not set
+          EOF
+          
           elif [[ "${{ inputs.branch }}" == "SM-S926B-Oneui8" ]]; then
           cat >> "$COMMON/arch/arm64/configs/s5e9945-bazel_defconfig" << 'EOF'
           # nuke root protection
