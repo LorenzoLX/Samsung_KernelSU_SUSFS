@@ -502,7 +502,7 @@ jobs:
           patch -p1 < ntsync_base.patch || true
           patch -p1 < ntsync_compat_${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch
           
-          cat >> "$DEFCONFIG" << 'EOF'
+          cat >> "$GKI_DEFCONFIG" << 'EOF'
           CONFIG_NTSYNC=y
           EOF
 
