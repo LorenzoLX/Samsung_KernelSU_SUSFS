@@ -31,6 +31,9 @@ on:
       ntsync:
         required: true
         type: string
+      optimizations:
+        required: true
+        type: string
 
 jobs:
   build-kernels-a12:
@@ -126,4 +129,5 @@ jobs:
       droidspace: ${{ inputs.droidspace }}
       release_type: ${{ inputs.release_type }}
       ntsync: ${{ inputs.ntsync }}
+      optimizations: ${{ inputs.optimizations }}
 
