@@ -39,6 +39,9 @@ on:
       ntsync:
         required: true
         type: string
+      optimizations:
+        required: true
+        type: string
 
 jobs:
   build-samsung-gki:
@@ -452,6 +455,23 @@ jobs:
           # Remove check_defconfig
           sed -i 's/check_defconfig//' ./build.config.gki
 
+      - name: Add optimizations from kernel patches/common
+        if: inputs.optimizations == 'true'
+        run: |
+          cd "$COMMON"
+          echo "Optimizing Kernel..."
+          cp "$KERNEL_PATCHES/common/"*.patch ./
+          rm -rf unicode_bypass_fix_6.1+.patch
+          rm -rf unicode_bypass_fix_6.1-.patch
+          rm -rf IPv6_NAT_FIX.patch
+
+          for p in *.patch; do
+             patch -p1 < "$p"
+              rm -f "$p"
+          done
+
+          echo "Kernel Optimized, hehe"
+
       - name: Disable logs and debugging for release kernel
         if: inputs.release_type == 'Release'
         run: |
@@ -485,12 +505,12 @@ jobs:
           CONFIG_KUNIT_DEBUGFS=n
           EOF
 
-          cat >> "$DEFCONFIG" << 'EOF'
-          CONFIG_PROFILING=n
-          CONFIG_THERMAL_EMULATION=n
-          CONFIG_PRINTK_TIME=n
-          CONFIG_MAGIC_SYSRQ=n
-          EOF
+#          cat >> "$DEFCONFIG" << 'EOF'
+#          CONFIG_PROFILING=n
+#          CONFIG_THERMAL_EMULATION=n
+#          CONFIG_PRINTK_TIME=n
+#          CONFIG_MAGIC_SYSRQ=n
+#          EOF
 
       - name: Add ntsync
         if: inputs.ntsync == 'true'
