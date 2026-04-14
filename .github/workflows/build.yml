@@ -110,6 +110,7 @@ jobs:
           else
             GKI_DEFCONFIG="$COMMON/arch/arm64/configs/gki_defconfig"
             DEFCONFIG="$COMMON/arch/arm64/configs/defconfig"
+            echo "GKI_DEFCONFIG=$GKI_DEFCONFIG" >> $GITHUB_ENV
           fi
 
           echo "ROOT=$ROOT" >> $GITHUB_ENV
@@ -118,7 +119,6 @@ jobs:
           echo "ANYKERNEL3=$ANYKERNEL3" >> $GITHUB_ENV
           echo "COMMON=$COMMON" >> $GITHUB_ENV
           echo "DEFCONFIG=$DEFCONFIG" >> $GITHUB_ENV
-          ECHO "GKI_DEFCONFIG=$GKI_DEFCONFIG" >> $GITHUB_ENV
           echo "ZEROMOUNT=$ZEROMOUNT" >> $GITHUB_ENV
           
       - name: Extract all tar.xz files and delete them
