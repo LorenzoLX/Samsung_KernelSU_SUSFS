@@ -33,7 +33,7 @@ on:
       droidspace:
         required: true
         type: string
-      crc:
+      logs:
         required: true
         type: string
 
@@ -108,7 +108,8 @@ jobs:
           elif [[ "${{ inputs.branch }}" == "SM-M146B-Oneui7-ADYJ2" ]]; then
             DEFCONFIG="$COMMON/arch/arm64/configs/s5e8535-m14xnsxx_defconfig"
           else
-            DEFCONFIG="$COMMON/arch/arm64/configs/gki_defconfig"
+            GKI_DEFCONFIG="$COMMON/arch/arm64/configs/gki_defconfig"
+            DEFCONFIG="$COMMON/arch/arm64/configs/defconfig"
           fi
 
           echo "ROOT=$ROOT" >> $GITHUB_ENV
@@ -117,6 +118,7 @@ jobs:
           echo "ANYKERNEL3=$ANYKERNEL3" >> $GITHUB_ENV
           echo "COMMON=$COMMON" >> $GITHUB_ENV
           echo "DEFCONFIG=$DEFCONFIG" >> $GITHUB_ENV
+          ECHO "GKI_DEFCONFIG=$GKI_DEFCONFIG" >> $GITHUB_ENV
           echo "ZEROMOUNT=$ZEROMOUNT" >> $GITHUB_ENV
           
       - name: Extract all tar.xz files and delete them
@@ -136,7 +138,7 @@ jobs:
           curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s canary
 
           cd "$GITHUB_WORKSPACE"
-          cat >> "$DEFCONFIG" << 'EOF'
+          cat >> "$GKI_DEFCONFIG" << 'EOF'
           # KernelSU Configuration
           CONFIG_KSU=y
           EOF
@@ -220,10 +222,6 @@ jobs:
           if [ -d "$KERNEL_PATCHES/samsung/${{ inputs.branch }}" ]; then
            echo "Directory exists, applying fixes"
            cp "$KERNEL_PATCHES/samsung/${{ inputs.branch }}/"*.patch ./
-             
-             if [ "${{ inputs.crc }}" == "false" ]; then
-               rm -rf Disable_CRC.patch
-             fi
 
            # Fix SUSFS rejects
            shopt -s nullglob
@@ -239,7 +237,7 @@ jobs:
           fi
           
           cd "$GITHUB_WORKSPACE"
-          cat >> "$DEFCONFIG" << 'EOF'
+          cat >> "$GKI_DEFCONFIG" << 'EOF'
           # SUSFS Configuration
           CONFIG_KSU_SUSFS=y
           EOF
@@ -281,7 +279,7 @@ jobs:
             #patch -p1 < 70_ksu_safety-wksu-${{ inputs.kernel_version }}.patch || true
 
           cd "$GITHUB_WORKSPACE"
-          cat >> "$DEFCONFIG" << 'EOF'
+          cat >> "$GKI_DEFCONFIG" << 'EOF'
           # Zeromount Configuration
           CONFIG_ZEROMOUNT=y
           EOF
@@ -324,27 +322,7 @@ jobs:
           sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }' security/Kconfig
 
           cd "$GITHUB_WORKSPACE"
-          sed -i '/^CONFIG_LSM=/ {
-          /baseband_guard/! s/"\([^"]*\)"/"baseband_guard,\1"/
-          }' "$DEFCONFIG"
-
-#          if [ -d "$KERNEL_PATCHES/samsung/${{ inputs.branch }}/bbg" ]; then
-#           echo "Directory exists, adding bbg in configLSM"
-#           cp "$KERNEL_PATCHES/samsung/${{ inputs.branch }}/bbg/"* ./
-
-#           # patch for adding bbg in configLSM for some devices 
-#           for p in *.patch; do
-#            patch -p1 < "$p"
-#            rm -f "$p"
-#           done
-#          else
-#           echo "BBG already enabled"
-#          fi
-
-#          if grep -qxF $'\t\tconst char* symlink_target_link = inode->i_op->get_link(dentry, inode, NULL);' ./Baseband-guard/baseband_guard.c; then
-#           echo "Applying BBG get_link fix"
-#           patch -p1 --forward < "$KERNEL_PATCHES/experimental/bbg/bbg_fix_get_link.patch"
-#          fi
+          sed -i '/^CONFIG_LSM=/ s/"$/,baseband_guard"/' "$DEFCONFIG"
 
       - name: Add unicodefix
         if: inputs.unicodefix == 'true'
@@ -368,7 +346,7 @@ jobs:
           curl -Ls https://github.com/nullptr-t-oss/android_kernel_common_oneplus_sm8550/commit/769a5cfdc17b98d8e0bd491d45f5651180e42196.patch | patch -p1 --forward
 
           cd "$GITHUB_WORKSPACE"
-          cat >> "$DEFCONFIG" <<EOF
+          cat >> "$GKI_DEFCONFIG" << 'EOF'
           # IPC
           CONFIG_SYSVIPC=y
           CONFIG_POSIX_MQUEUE=y
@@ -402,7 +380,7 @@ jobs:
         run: |
           
           echo "Initializing kernel configuration..."
-          cat >> "$DEFCONFIG" << 'EOF'
+          cat >> "$GKI_DEFCONFIG" << 'EOF'
           # Mountify Support
           CONFIG_OVERLAY_FS=y
           CONFIG_TMPFS_XATTR=y
@@ -433,7 +411,7 @@ jobs:
           EOF
 
           else
-          cat >> "$DEFCONFIG" << 'EOF'
+          cat >> "$GKI_DEFCONFIG" << 'EOF'
           # nuke root protection
           CONFIG_UH=n
           CONFIG_UH_RKP=n
@@ -454,25 +432,45 @@ jobs:
           # Remove check_defconfig
           sed -i 's/check_defconfig//' ./build.config.gki
 
-      - name: Force load module configs
-        if: inputs.crc == 'true'
+      - name: Disable logs and debugging for some kernel performance
+        if: inputs.logs == 'true'
         run: |
-          if [[ ${{ inputs.branch }} == SM-A546* || "${{ inputs.branch }}" == "SM-M146B-Oneui7-ADYJ2" ]]; then
-          cat >> "$DEFCONFIG" << 'EOF'
-          #Force Load Kernel Modules
-          CONFIG_MODULES=y
-          CONFIG_MODULE_FORCE_LOAD=y
-          CONFIG_MODULE_UNLOAD=y
-          CONFIG_MODULE_FORCE_UNLOAD=y
-          CONFIG_MODVERSIONS=y
-          CONFIG_MODULE_SRCVERSION_ALL=n
-          CONFIG_MODULE_SIG=n
-          CONFIG_MODULE_COMPRESS=n
-          CONFIG_TRIM_UNUSED_KSYMS=n
+          cat >> "$GKI_DEFCONFIG" << 'EOF'
+          CONFIG_PROFILING=n
+          CONFIG_THERMAL_EMULATION=n
+          CONFIG_PRINTK_TIME=n
+          CONFIG_MAGIC_SYSRQ=n
+          CONFIG_PM_DEBUG=n
+          CONFIG_PM_ADVANCED_DEBUG=n
+          CONFIG_CMA_DEBUGFS=n
+          CONFIG_USB_DEBUG_DETAILED_LOG=n
+          CONFIG_THERMAL_STATISTICS=n
+          CONFIG_DMABUF_SYSFS_STATS=n
+          CONFIG_ANDROID_DEBUG_SYMBOLS=n
+          CONFIG_ANDROID_DEBUG_KINFO=n
+          CONFIG_TRACE_MMIO_ACCESS=n
+          CONFIG_PRINTK_CALLER=n
+          CONFIG_DYNAMIC_DEBUG_CORE=n
+          CONFIG_UBSAN=n
+          CONFIG_PAGE_OWNER=n
+          CONFIG_PAGE_PINNER=n
+          CONFIG_PER_VMA_LOCK_STATS=n
+          CONFIG_DEBUG_MEMORY_INIT=n
+          CONFIG_KASAN=n
+          CONFIG_KASAN_HW_TAGS=n
+          CONFIG_KFENCE=n
+          CONFIG_SCHEDSTATS=n
+          CONFIG_HIST_TRIGGERS=n
+          CONFIG_KUNIT=n
+          CONFIG_KUNIT_DEBUGFS=n
           EOF
-          else
-            echo "kernel_platform devices don't need these, so moving on"
-          fi
+
+          cat >> "$DEFCONFIG" << 'EOF'
+          CONFIG_PROFILING=n
+          CONFIG_THERMAL_EMULATION=n
+          CONFIG_PRINTK_TIME=n
+          CONFIG_MAGIC_SYSRQ=n
+          EOF
 
       - name: Change Kernel Name and remove protected exports
         run: |
