@@ -80,6 +80,15 @@ on:
           - no
         default: no
 
+      ntsync:
+        description: "add ntsync?"
+        required: true
+        type: choice
+        options:
+          - yes
+          - no
+        default: no
+
 jobs:
 
   build-samsung:
@@ -93,6 +102,7 @@ jobs:
       wksu: ${{ inputs.wksu }}
       droidspace: ${{ inputs.droidspace }}
       logs: ${{ inputs.logs }}
+      ntsync: ${{ inputs.ntsync }}
 
   release:
     runs-on: ubuntu-latest
