@@ -33,7 +33,7 @@ on:
       droidspace:
         required: true
         type: string
-      logs:
+      release_type:
         required: true
         type: string
       ntsync:
@@ -452,8 +452,8 @@ jobs:
           # Remove check_defconfig
           sed -i 's/check_defconfig//' ./build.config.gki
 
-      - name: Disable logs and debugging for some kernel performance
-        if: inputs.logs == 'true'
+      - name: Disable logs and debugging for release kernel
+        if: inputs.release_type == 'Release'
         run: |
           cat >> "$GKI_DEFCONFIG" << 'EOF'
           CONFIG_PROFILING=n
