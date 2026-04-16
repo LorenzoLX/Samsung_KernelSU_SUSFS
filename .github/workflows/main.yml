@@ -89,6 +89,15 @@ on:
           - no
         default: no
 
+      bbrv3:
+        description: "Add bbrv3?"
+        required: true
+        type: choice
+        options:
+        - yes
+        - no
+        default: yes
+
 jobs:
 
   build-samsung:
@@ -104,6 +113,7 @@ jobs:
       ntsync: ${{ inputs.ntsync }}
       release_type: ${{ inputs.release_type }}
       optimizations: ${{ inputs.optimizations }}
+      bbrv3: ${{ inputs.bbrv3 }}
 
   release:
     runs-on: ubuntu-latest
