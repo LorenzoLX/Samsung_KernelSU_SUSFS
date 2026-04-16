@@ -42,6 +42,9 @@ on:
       optimizations:
         required: true
         type: string
+      bbrv3:
+        required: true
+        type: string
 
 jobs:
   build-samsung-gki:
@@ -329,6 +332,23 @@ jobs:
 
           cd "$GITHUB_WORKSPACE"
           sed -i '/^CONFIG_LSM=/ s/"$/,baseband_guard"/' "$GKI_DEFCONFIG"
+
+      - name: Add bbrv3
+        if: inputs.bbrv3 == 'true'
+        run: |  
+          cd "$COMMON"
+          cp "$KERNEL_PATCHES/bbr/bbrv3-a14-6.1.patch" .
+          patch -p1 < bbrv3-a14-6.1.patch
+
+          cd "$GITHUB_WORKSPACE"
+          cat >> "$GKI_DEFCONFIG" << 'EOF'
+          CONFIG_TCP_CONG_BBR=y
+          CONFIG_DEFAULT_BBR=y
+          CONFIG_DEFAULT_TCP_CONG="bbr"
+          CONFIG_INET=y
+          CONFIG_TCP_ADVANCED=y
+          CONFIG_NET_SCH_FQ=y
+          EOF
 
       - name: Add unicodefix
         if: inputs.unicodefix == 'true'
