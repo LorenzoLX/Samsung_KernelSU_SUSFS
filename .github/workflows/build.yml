@@ -134,11 +134,11 @@ jobs:
             rm "$file"
           done
 
-      - name: Add Wild_KSU
+      - name: Add KernelSU-Next
         if: inputs.wksu == 'true'
         run: |
           cd "$COMMON"
-          curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s canary
+          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s dev
 
           cd "$GITHUB_WORKSPACE"
           cat >> "$GKI_DEFCONFIG" << 'EOF'
@@ -146,10 +146,10 @@ jobs:
           CONFIG_KSU=y
           EOF
 
-      - name: Getting Wild_KSU Version
+      - name: Getting KernelSU-Next Version
         if: inputs.wksu == 'true'
         run: |
-          cd "$COMMON/Wild_KSU/kernel"
+          cd "$COMMON/KernelSU-Next/kernel"
           
           KSU_DIR=$(pwd)
           KBUILD="Kbuild"
@@ -174,8 +174,8 @@ jobs:
 
           else
               echo "⚠ Not a git repo, using defaults"
-              KSU_VERSION=33219
-              KSU_GIT_TAG="v3.1.2"
+              KSU_VERSION=33129
+              KSU_GIT_TAG="v3.2.0"
           fi
 
           echo "Computed version: $KSU_VERSION"
@@ -198,9 +198,24 @@ jobs:
       - name: Apply SUSFS Patches
         if: inputs.susfs == 'true'
         run: |
-          cd "$COMMON"
-          # Apply compatibility fixes
-          SUSFS_VERSION="2.1.0"
+          cd "$COMMON/KernelSU-Next"
+          SUSFS_VERSION="v2.1.0"
+          
+          # Apply SUSFS to KernelSU-Next
+          cp "$SUSFS4KSU/kernel_patches/10_enable_susfs_for_ksu.patch .
+          patch -p1 10_enable_susfs_for_ksu.patch
+          rm -rf 10_enable_susfs_for_ksu.patch
+
+          #Fix rejects from adding susfs to KSUN
+          cp "$KERNEL_PATCHES/next/susfs_fix_patches/$SUSFS_VERSION"/*.patch ./
+          rm -rf multi_manager.patch
+          rm -rf multi_sepolicy_fix.patch
+          for p in *.patch; do
+            patch -p1 < "$p"
+             rm -f "$p"
+          done
+           
+          # Apply SUSFS to kernel
           
           cp "$SUSFS4KSU/kernel_patches/fs/"* ./fs/
           cp "$SUSFS4KSU/kernel_patches/include/linux/"* ./include/linux/
@@ -513,12 +528,10 @@ jobs:
       - name: Change Kernel Name and remove protected exports
         run: |
           cd "$COMMON"
-          if [[ "${{ inputs.release_type }}" != "Release" ]]; then
             #Add Wild to Kernel Version
             sed -i '$s|echo "\$res"|echo "\$res-Wild"|' ./scripts/setlocalversion
             #Set Kernel Timestamp
-            perl -pi -e 's{UTS_VERSION="\$\(echo \$UTS_VERSION \$CONFIG_FLAGS \$TIMESTAMP \| cut -b -\$UTS_LEN\)"}{UTS_VERSION="#1 SMP PREEMPT Sun Apr 20 04:20:00 UTC 2025"}' ./scripts/mkcompile_h
-          fi
+            #perl -pi -e 's{UTS_VERSION="\$\(echo \$UTS_VERSION \$CONFIG_FLAGS \$TIMESTAMP \| cut -b -\$UTS_LEN\)"}{UTS_VERSION="#1 SMP PREEMPT Sun Apr 20 04:20:00 UTC 2025"}' ./scripts/mkcompile_h
           
           #Remove Abi Exports and Error
           rm -rf ./android/abi_gki_protected_exports_*
@@ -534,7 +547,7 @@ jobs:
         run: |
           ARTIFACT_BASE="${{ inputs.branch }}-${{ inputs.kernel_version }}-${{ inputs.android_version }}"
           
-          # This gives: KSU33208-branch-xxx-xxx
+          # This gives: KSUxxxxx-branch-xxx-xxx
           FILE_NAME="KSU${KSU_VERSION}-${ARTIFACT_BASE}"
           
           echo "ARTIFACT_BASE=$ARTIFACT_BASE" >> $GITHUB_ENV
@@ -668,15 +681,15 @@ jobs:
           echo "- **Bypass Mode**: ${{ matrix.apply_bypass }}" >> build_summary.md
           echo "" >> build_summary.md
 
-          # Get Wild_KSU commit
-          if [ -d "$CONFIG/Wild_KSU" ]; then
-            cd "$CONFIG/Wild_KSU"
-            WKSU_COMMIT=$(git rev-parse HEAD)
-            WKSU_URL="https://github.com/WildKernels/Wild_KSU/commit/$WKSU_COMMIT"
-            echo "- **Wild_KSU**: [$WKSU_COMMIT]($WKSU_URL)" >> "$GITHUB_WORKSPACE/build_summary.md"
+          # Get KernelSU-Next commit
+          if [ -d "$CONFIG/KernelSU-Next" ]; then
+            cd "$CONFIG/KernelSU-Next"
+            KSUN_COMMIT=$(git rev-parse HEAD)
+            KSUN_URL="https://github.com/WildKernels/KernelSU-Next/commit/$KSUN_COMMIT"
+            echo "- **KernelSU-Next**: [$KSUN_COMMIT]($KSUN_URL)" >> "$GITHUB_WORKSPACE/build_summary.md"
             cd "$GITHUB_WORKSPACE"
           else
-            echo "- **Wild_KSU**: not present" >> build_summary.md
+            echo "- **KernelSU-Next**: not present" >> build_summary.md
           fi
           
           # Get Baseband-guard commit
