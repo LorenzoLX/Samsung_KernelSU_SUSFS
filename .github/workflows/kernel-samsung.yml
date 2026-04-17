@@ -25,9 +25,6 @@ on:
       droidspace:
         required: true
         type: string
-      release_type:
-        required: true
-        type: string
       ntsync:
         required: true
         type: string
@@ -130,7 +127,6 @@ jobs:
       zeromount: ${{ inputs.zeromount }}
       wksu: ${{ inputs.wksu }}
       droidspace: ${{ inputs.droidspace }}
-      release_type: ${{ inputs.release_type }}
       ntsync: ${{ inputs.ntsync }}
       optimizations: ${{ inputs.optimizations }}
 
