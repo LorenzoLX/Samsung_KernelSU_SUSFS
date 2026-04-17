@@ -33,9 +33,6 @@ on:
       droidspace:
         required: true
         type: string
-      release_type:
-        required: true
-        type: string
       ntsync:
         required: true
         type: string
