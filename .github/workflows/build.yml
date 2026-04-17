@@ -361,13 +361,8 @@ jobs:
           cp "$KERNEL_PATCHES/bbr/bbrv3-a14-6.1.patch" .
           patch -p1 < bbrv3-a14-6.1.patch
 
-          mods_file=modules.bzl
-
-          for m in "net/ipv4/tcp_bic.ko" "net/ipv4/tcp_htcp.ko" "net/ipv4/tcp_westwood.ko"; do
-            grep -q "\"$m\"" "$mods_file" && continue
-            sed -i "/_ARM64_GKI_MODULES_LIST = \[/,/^]/ s|^]|    \"$m\",\
-          ]|" "$mods_file"
-          done
+          sed -i '\|net/ipv4/tcp_bic\.ko|d; \|net/ipv4/tcp_htcp\.ko|d; \|net/ipv4/tcp_westwood\.ko|d' modules.bzl
+          sed -i '\|net/ipv4/tcp_bic\.ko|d; \|net/ipv4/tcp_htcp\.ko|d; \|net/ipv4/tcp_westwood\.ko|d' BUILD.bazel
 
           cd "$GITHUB_WORKSPACE"
           cat >> "$GKI_DEFCONFIG" << 'EOF'
