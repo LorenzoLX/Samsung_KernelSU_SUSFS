@@ -361,9 +361,6 @@ jobs:
           cp "$KERNEL_PATCHES/bbr/bbrv3-a14-6.1.patch" .
           patch -p1 < bbrv3-a14-6.1.patch
 
-          sed -i '\|net/ipv4/tcp_bic\.ko|d; \|net/ipv4/tcp_htcp\.ko|d; \|net/ipv4/tcp_westwood\.ko|d' modules.bzl
-          sed -i '\|net/ipv4/tcp_bic\.ko|d; \|net/ipv4/tcp_htcp\.ko|d; \|net/ipv4/tcp_westwood\.ko|d' BUILD.bazel
-
           cd "$GITHUB_WORKSPACE"
           cat >> "$GKI_DEFCONFIG" << 'EOF'
           CONFIG_TCP_CONG_ADVANCED=y
@@ -371,10 +368,6 @@ jobs:
           CONFIG_DEFAULT_BBR=y
           CONFIG_DEFAULT_TCP_CONG="bbr"
           CONFIG_NET_SCH_FQ=y
-
-          # CONFIG_TCP_CONG_BIC is not set
-          # CONFIG_TCP_CONG_WESTWOOD is not set
-          # CONFIG_TCP_CONG_HTCP is not set
           EOF
 
       - name: Add unicodefix
