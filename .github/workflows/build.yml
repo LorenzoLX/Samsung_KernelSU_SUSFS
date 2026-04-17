@@ -536,6 +536,7 @@ jobs:
           elif [[ ${{ inputs.branch }} == SM-A546* || "${{ inputs.branch }}" == "SM-M146B-Oneui7-ADYJ2" || "${{ inputs.branch }}" == "SM-S908B-Oneui8-bitK" ]]; then
             sudo apt update
             sudo apt-get install -y libyaml-dev
+            chmod +x build_kernel.sh
             LTO=thin ./build_kernel.sh || true
           elif [[ "${{ inputs.branch }}" == "SM-A566B" ]]; then
             chmod +x build_script.sh
