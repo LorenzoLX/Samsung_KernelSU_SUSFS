@@ -341,9 +341,11 @@ jobs:
           patch -p1 < bbrv3-a14-6.1.patch
 
           mods_file=modules.bzl
+
           for m in "net/ipv4/tcp_bic.ko" "net/ipv4/tcp_htcp.ko" "net/ipv4/tcp_westwood.ko"; do
-            grep -q "'$m'" "$mods_file" && continue
-            sed -i "/_ARM64_GKI_MODULES_LIST = \[/,/^]/ s/^]/    \"$m\",\n]/" "$mods_file"
+            grep -q "\"$m\"" "$mods_file" && continue
+            sed -i "/_ARM64_GKI_MODULES_LIST = \[/,/^]/ s|^]|    \"$m\",\
+          ]|" "$mods_file"
           done
 
           cd "$GITHUB_WORKSPACE"
