@@ -333,6 +333,27 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           sed -i '/^CONFIG_LSM=/ s/"$/,baseband_guard"/' "$GKI_DEFCONFIG"
 
+      - name: temp fix for m55 bootloop maybe
+        if: inputs.branch == 'SM-M556B-Oneui8'
+        run: |   
+          cd "$COMMON"
+
+          curl -L -s https://raw.githubusercontent.com/jimsterino98/Android-Kernel-Tutorials/refs/heads/main/patches/010.Disable-CRC-Checks.patch | patch -p1 --forward
+
+          cd "$GITHUB_WORKSPACE"
+          cat >> "$GKI_DEFCONFIG" << 'EOF'
+          #Force Load Kernel Modules
+          CONFIG_MODULES=y
+          CONFIG_MODULE_FORCE_LOAD=y
+          CONFIG_MODULE_UNLOAD=y
+          CONFIG_MODULE_FORCE_UNLOAD=y
+          CONFIG_MODVERSIONS=y
+          CONFIG_MODULE_SRCVERSION_ALL=n
+          CONFIG_MODULE_SIG=n
+          CONFIG_MODULE_COMPRESS=n
+          CONFIG_TRIM_UNUSED_KSYMS=n
+          EOF
+
       - name: Add bbrv3
         if: inputs.bbrv3 == 'true'
         run: |  
