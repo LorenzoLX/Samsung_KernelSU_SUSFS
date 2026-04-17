@@ -340,14 +340,23 @@ jobs:
           cp "$KERNEL_PATCHES/bbr/bbrv3-a14-6.1.patch" .
           patch -p1 < bbrv3-a14-6.1.patch
 
+          mods_file=modules.bzl
+          for m in "net/ipv4/tcp_bic.ko" "net/ipv4/tcp_htcp.ko" "net/ipv4/tcp_westwood.ko"; do
+            grep -q "'$m'" "$mods_file" && continue
+            sed -i "/_ARM64_GKI_MODULES_LIST = \[/,/^]/ s/^]/    \"$m\",\n]/" "$mods_file"
+          done
+
           cd "$GITHUB_WORKSPACE"
           cat >> "$GKI_DEFCONFIG" << 'EOF'
+          CONFIG_TCP_CONG_ADVANCED=y
           CONFIG_TCP_CONG_BBR=y
           CONFIG_DEFAULT_BBR=y
           CONFIG_DEFAULT_TCP_CONG="bbr"
-          CONFIG_INET=y
-          CONFIG_TCP_ADVANCED=y
           CONFIG_NET_SCH_FQ=y
+
+          # CONFIG_TCP_CONG_BIC is not set
+          # CONFIG_TCP_CONG_WESTWOOD is not set
+          # CONFIG_TCP_CONG_HTCP is not set
           EOF
 
       - name: Add unicodefix
