@@ -138,7 +138,7 @@ jobs:
         if: inputs.wksu == 'true'
         run: |
           cd "$COMMON"
-          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s stable
+          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s
 
           cd "$GITHUB_WORKSPACE"
           cat >> "$GKI_DEFCONFIG" << 'EOF'
@@ -203,7 +203,7 @@ jobs:
           
           # Apply SUSFS to KernelSU-Next
           cp "$SUSFS4KSU/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch" .
-          patch -p1 10_enable_susfs_for_ksu.patch || true
+          patch -p1 < 10_enable_susfs_for_ksu.patch || true
           rm -rf 10_enable_susfs_for_ksu.patch
 
           #Fix rejects from adding susfs to KSUN
