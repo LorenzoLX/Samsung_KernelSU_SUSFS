@@ -138,7 +138,7 @@ jobs:
         if: inputs.wksu == 'true'
         run: |
           cd "$COMMON"
-          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s
+          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s stable
 
           cd "$GITHUB_WORKSPACE"
           cat >> "$GKI_DEFCONFIG" << 'EOF'
@@ -217,7 +217,7 @@ jobs:
            
           # Apply SUSFS to kernel
 
-          cd "$COMMON"
+          cd ..
           
           cp "$SUSFS4KSU/kernel_patches/fs/"* ./fs/
           cp "$SUSFS4KSU/kernel_patches/include/linux/"* ./include/linux/
