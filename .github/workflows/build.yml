@@ -216,6 +216,8 @@ jobs:
           done
            
           # Apply SUSFS to kernel
+
+          cd "$COMMON"
           
           cp "$SUSFS4KSU/kernel_patches/fs/"* ./fs/
           cp "$SUSFS4KSU/kernel_patches/include/linux/"* ./include/linux/
