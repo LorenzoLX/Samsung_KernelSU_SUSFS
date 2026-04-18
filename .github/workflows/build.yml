@@ -359,6 +359,9 @@ jobs:
           CONFIG_MODULE_SIG=n
           CONFIG_MODULE_COMPRESS=n
           CONFIG_TRIM_UNUSED_KSYMS=n
+          
+          #Add btrfs user request
+          CONFIG_BTRFS_FS=y
           EOF
 
       - name: Add unicodefix
