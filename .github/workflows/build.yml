@@ -129,8 +129,6 @@ jobs:
       - name: Fix WiFi and Bluetooth on Samsung 6.6 GKI devices
         if: inputs.kernel_version == '6.6'
         uses: ./.github/actions/6.6-fix
-        with:
-          kernel_version: ${{ inputs.kernel_version }}
 
       - name: Add BBG
         if: inputs.bbg == 'true'
