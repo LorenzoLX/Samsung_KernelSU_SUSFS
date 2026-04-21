@@ -78,28 +78,14 @@ jobs:
           # Set CONFIG as an environment variable for future steps
           echo "CONFIG=$CONFIG" >> $GITHUB_ENV
 
-      - name: Clone AnyKernel3 and Other Dependencies
-        run: |
-          ANYKERNEL_BRANCH="gki-2.0"
-          SUSFS_BRANCH="gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}"
+      - name: dependencies
+        uses: ./.github/actions/dependencies
+        with:
+          zeromount: ${{ inputs.zeromount }}
+          susfs: ${{ inputs.susfs }}
+          android_version: ${{ inputs.android_version }}
+          kernel_version: ${{ inputs.kernel_version }}
           
-          git clone https://github.com/WildKernels/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
-          git clone https://github.com/WildKernels/kernel_patches.git
-          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
-          git clone https://github.com/jimsterino98/Super-Builders.git
-
-          cd susfs4ksu
-          if [[ "${{ inputs.android_version }}-${{ inputs.kernel_version }}" == "android12-5.10" ]]; then
-            COMMIT=674f72b6f683e837d7f557704cabe00a83eeb0b4
-          elif [[ "${{ inputs.android_version }}-${{ inputs.kernel_version }}" == "android13-5.15" ]]; then
-            COMMIT=eaa5d299dd85a4230f936b94dc5dd8303f27130a
-          elif [[ "${{ inputs.android_version }}-${{ inputs.kernel_version }}" == "android14-6.1" ]]; then
-            COMMIT=971cc4e770b7f344a4df35ce92d7a859e6a1e0fd
-          elif [[ "${{ inputs.android_version }}-${{ inputs.kernel_version }}" == "android15-6.6" ]]; then
-            COMMIT=85bcfac5edc8ba7808581e8d0a3ca9c7deca78e4
-          fi
-          git checkout "$COMMIT"
-      
       - name: Download Kernel
         uses: ./.github/actions/clone-kernel
         with:
@@ -108,10 +94,18 @@ jobs:
       - name: Set Path Environment Variables
         run: |
           ROOT="$GITHUB_WORKSPACE"
-          SUSFS4KSU="$ROOT/susfs4ksu"
-          KERNEL_PATCHES="$ROOT/kernel_patches"
+          if [[ ${{ inputs.susfs }} == 'true' ]]; then
+           SUSFS4KSU="$ROOT/susfs4ksu"
+           KERNEL_PATCHES="$ROOT/kernel_patches"
+           echo "SUSFS4KSU=$SUSFS4KSU" >> $GITHUB_ENV
+           echo "KERNEL_PATCHES=$KERNEL_PATCHES" >> $GITHUB_ENV
+          fi
           ANYKERNEL3="$ROOT/AnyKernel3"
-          ZEROMOUNT="$ROOT/Super-Builders"
+          if [[ ${{ inputs.zeromount }} == 'true' ]]; then
+           ZEROMOUNT="$ROOT/Super-Builders"
+           echo "ZEROMOUNT=$ZEROMOUNT" >> $GITHUB_ENV
+          fi
+          
           if [[ ${{ inputs.branch }} == SM-A546* || "${{ inputs.branch }}" == "SM-M146B-Oneui7-ADYJ2" || "${{ inputs.branch }}" == "SM-S908B-Oneui8-bitK" ]]; then  
             COMMON="$CONFIG"
           elif [[ "${{ inputs.branch }}" == "SM-A566B" || ${{ inputs.branch }} == SM-A055* ]]; then
@@ -135,12 +129,9 @@ jobs:
           fi
 
           echo "ROOT=$ROOT" >> $GITHUB_ENV
-          echo "SUSFS4KSU=$SUSFS4KSU" >> $GITHUB_ENV
-          echo "KERNEL_PATCHES=$KERNEL_PATCHES" >> $GITHUB_ENV
           echo "ANYKERNEL3=$ANYKERNEL3" >> $GITHUB_ENV
           echo "COMMON=$COMMON" >> $GITHUB_ENV
           echo "GKI_DEFCONFIG=$GKI_DEFCONFIG" >> $GITHUB_ENV
-          echo "ZEROMOUNT=$ZEROMOUNT" >> $GITHUB_ENV
           
       - name: Extract all tar.xz files and delete them
         run: |
@@ -154,205 +145,84 @@ jobs:
 
       - name: Add KernelSU-Next
         if: inputs.wksu == 'true'
-        run: |
-          cd "$COMMON"
-          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s dev
+        uses: ./.github/actions/ksun
 
-          cd KernelSU-Next
-          git checkout 551ad80473f60e052917aec08abf5323b6ab2f7c
+#      - name: Getting KernelSU-Next Version
+#        if: inputs.wksu == 'true'
+#        run: |
+#          cd "$COMMON/KernelSU-Next/kernel"
+#          
+#          KSU_DIR=$(pwd)
+#          KBUILD="Kbuild"
+#          BASE_VERSION=30000
 
-          cd "$GITHUB_WORKSPACE"
-          cat >> "$GKI_DEFCONFIG" << 'EOF'
-          # KernelSU Configuration
-          CONFIG_KSU=y
-          EOF
 
-      - name: Getting KernelSU-Next Version
-        if: inputs.wksu == 'true'
-        run: |
-          cd "$COMMON/KernelSU-Next/kernel"
-          
-          KSU_DIR=$(pwd)
-          KBUILD="Kbuild"
-          BASE_VERSION=30000
+          #if [ -d "$KSU_DIR/.git" ]; then
+           #   echo "✔ Git repo detected"
 
-          if [ -d "$KSU_DIR/.git" ]; then
-              echo "✔ Git repo detected"
-
-              # Unshallow if needed
-              if [ -f "$KSU_DIR/.git/shallow" ]; then
-                  git -C "$KSU_DIR" fetch --unshallow || true
-              fi
+            #  # Unshallow if needed
+             # if [ -f "$KSU_DIR/.git/shallow" ]; then
+              #    git -C "$KSU_DIR" fetch --unshallow || true
+       #       fi
 
               # Get commit count
-              KSU_GIT_VERSION=$(git -C "$KSU_DIR" rev-list --count HEAD)
+        #      KSU_GIT_VERSION=$(git -C "$KSU_DIR" rev-list --count HEAD)
 
               # Calculate version
-              KSU_VERSION=$((BASE_VERSION + KSU_GIT_VERSION))
+         #     KSU_VERSION=$((BASE_VERSION + KSU_GIT_VERSION))
 
               # Get latest tag (safe)
-              KSU_GIT_TAG=$(git -C "$KSU_DIR" describe --tags --abbrev=0 2>/dev/null || echo "v0.0.1")
+          #    KSU_GIT_TAG=$(git -C "$KSU_DIR" describe --tags --abbrev=0 2>/dev/null || echo "v0.0.1")
 
-          else
-              echo "⚠ Not a git repo, using defaults"
-              KSU_VERSION=33129
-              KSU_GIT_TAG="v3.2.0"
-          fi
+ #         else
+  #            echo "⚠ Not a git repo, using defaults"
+   #           KSU_VERSION=33129
+    #          KSU_GIT_TAG="v3.2.0"
+     #     fi
 
-          echo "Computed version: $KSU_VERSION"
-          echo "Computed tag: $KSU_GIT_TAG"
+      #    echo "Computed version: $KSU_VERSION"
+       #   echo "Computed tag: $KSU_GIT_TAG"
 
           # Export for CI (optional)
-          echo "KSU_VERSION=$KSU_VERSION" >> $GITHUB_ENV
-          echo "KSU_VERSION_TAG=$KSU_GIT_TAG" >> $GITHUB_ENV
+     #     echo "KSU_VERSION=$KSU_VERSION" >> $GITHUB_ENV
+      #    echo "KSU_VERSION_TAG=$KSU_GIT_TAG" >> $GITHUB_ENV
 
           # --- Update Kbuild fallback values ---
 
           # Update numeric fallback
-          sed -i "s/KSU_VERSION_FALLBACK := [0-9]\+/KSU_VERSION_FALLBACK := ${KSU_VERSION}/" "$KBUILD"
+    #      sed -i "s/KSU_VERSION_FALLBACK := [0-9]\+/KSU_VERSION_FALLBACK := ${KSU_VERSION}/" "$KBUILD"
 
           # Update tag fallback
-          sed -i "s/KSU_VERSION_TAG_FALLBACK := .*/KSU_VERSION_TAG_FALLBACK := ${KSU_GIT_TAG}/" "$KBUILD"
+     #     sed -i "s/KSU_VERSION_TAG_FALLBACK := .*/KSU_VERSION_TAG_FALLBACK := ${KSU_GIT_TAG}/" "$KBUILD"
 
-          echo "✅ Updated fallback values in $KBUILD"
+      #    echo "✅ Updated fallback values in $KBUILD"
 
+      - name: Download susfs and kernel patches
+        if: inputs.susfs == 'true'
+        uses: ./.github/actions/susfs-clone
+        with:
+          android_version: ${{ inputs.android_version }}
+          kernel_version: ${{ inputs.kernel_version }}
+          
       - name: Apply SUSFS Patches
         if: inputs.susfs == 'true'
-        run: |
-          cd "$COMMON/KernelSU-Next"
-          SUSFS_VERSION="v2.1.0"
-          
-          # Apply SUSFS to KernelSU-Next
-          cp "$SUSFS4KSU/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch" .
-          patch -p1 < 10_enable_susfs_for_ksu.patch || true
-          rm -rf 10_enable_susfs_for_ksu.patch
+        uses: ./.github/actions/susfs-patches
+        with:
+          android_version: ${{ inputs.android_version }}
+          kernel_version: ${{ inputs.kernel_version }}
 
-          #Fix rejects from adding susfs to KSUN
-          cp "$KERNEL_PATCHES/next/susfs_fix_patches/$SUSFS_VERSION/"*.patch .
-          rm -rf multi_manager.patch
-          rm -rf multi_sepolicy_fix.patch
-          for p in *.patch; do
-             patch -p1 < "$p"
-              rm -f "$p"
-          done
-          
-           
-          # Apply SUSFS to kernel
+      - name: Apply zeromount Patches
+        if: inputs.susfs == 'true' && inputs.zeromount == 'true'
+        uses: ./.github/actions/zeromount
+        with:
+          android_version: ${{ inputs.android_version }}
+          kernel_version: ${{ inputs.kernel_version }}
 
-          cd ..
-          
-          cp "$SUSFS4KSU/kernel_patches/fs/"* ./fs/
-          cp "$SUSFS4KSU/kernel_patches/include/linux/"* ./include/linux/
-          cp "$SUSFS4KSU/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch" ./          
-
-          #Prepare open.c for susfs patching
-          sed -i '/#ifdef CONFIG_SECURITY_DEFEX/,/^#endif/d' fs/open.c
-
-          #Prepare namespace.c for susfs patching
-          sed -i '/copy_flags = CL_COPY_UNBINDABLE | CL_EXPIRE;/,/#endif/ {
-            /#ifdef CONFIG_KDP_NS/,/#endif/ {
-              /#else/,/#endif/!d
-              /#else/d
-              /#endif/d
-            }
-          }' fs/namespace.c
-          
-          # Apply SUSFS core patch
-          patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-          rm -rf 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch
-          
-          if [ -d "$KERNEL_PATCHES/samsung/${{ inputs.branch }}" ]; then
-           echo "Directory exists, applying fixes"
-           cp "$KERNEL_PATCHES/samsung/${{ inputs.branch }}/"*.patch ./
-
-           # Fix SUSFS rejects
-           shopt -s nullglob
-
-          for p in *.patch; do
-             patch -p1 < "$p"
-              rm -f "$p"
-          done
-
-          shopt -u nullglob
-          else
-           echo "No directory found, skipping"
-          fi
-          
-          cd "$GITHUB_WORKSPACE"
-          cat >> "$GKI_DEFCONFIG" << 'EOF'
-          # SUSFS Configuration
-          CONFIG_KSU_SUSFS=y
-          EOF
-          
-          if [[ ${{ inputs.zeromount }} == 'true' ]]; then
-
-            echo "adding zeromount..."
-            
-            cd "$COMMON"
-            cp "$ZEROMOUNT/${{ inputs.android_version }}-${{ inputs.kernel_version }}/WildKSU/patches/60_zeromount-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch" .
-            #patch -p1 < 51_enhanced_susfs_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-            patch -p1 < 60_zeromount-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-            rm -rf 60_zeromount-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch
-
-            if [ -f fs/proc/task_mmu.c ]; then
-              echo "Fixing task_mmu.c..."
-
-              sed -i '/pgoff = ((loff_t)vma->vm_pgoff) << PAGE_SHIFT;/a\
-              #ifdef CONFIG_ZEROMOUNT\
-              \tzeromount_spoof_mmap_metadata(inode, \&dev, \&ino);\
-              #endif' fs/proc/task_mmu.c
-            fi
-
-            if [ -f fs/stat.c.rej ]; then
-            echo "fixing stat.c."
-
-              if ! grep -q 'zeromount_stat_hook(dfd, filename, stat, request_mask, flags)' fs/stat.c; then
-                perl -0pi -e 's@(static int vfs_statx\(.*?\)\s*\{.*?orig_flow:\n#endif\n)@$1\n#ifdef CONFIG_ZEROMOUNT\n\tif (filename) {\n\t\tint zm_ret = zeromount_stat_hook(dfd, filename, stat, request_mask, flags);\n\t\tif (zm_ret != -ENOENT)\n\t\t\treturn zm_ret;\n\t}\n#endif\n\n@s' fs/stat.c
-              fi
-            fi
-
-            if [ -f fs/Kconfig.rej ]; then
-              echo "Applying Kconfig zeromount fix..."
-
-              if ! grep -q '^config ZEROMOUNT$' fs/Kconfig; then
-                  perl -0pi -e 's@(config IO_WQ\n\tbool\n)@\1\nconfig ZEROMOUNT\n\tbool "ZeroMount Path Redirection Subsystem"\n\tdefault y\n\thelp\n\t  ZeroMount allows path redirection and virtual file injection\n\t  without mounting filesystems. Useful for systemless modifications.\n\n@' fs/Kconfig
-              fi
-            fi
-            #patch -p1 < 70_ksu_safety-wksu-${{ inputs.kernel_version }}.patch || true
-
-          cd "$GITHUB_WORKSPACE"
-          cat >> "$GKI_DEFCONFIG" << 'EOF'
-          # Zeromount Configuration
-          CONFIG_ZEROMOUNT=y
-          EOF
-          fi
-          
       - name: Fix WiFi and Bluetooth on Samsung 6.6 GKI devices
-        if: ${{ inputs.kernel_version == '6.6' }}
-        run: |
-         cd "$COMMON"
-         
-         SYMBOL_LIST=android/abi_gki_aarch64_galaxy
-         echo "kdp_set_cred_non_rcu" >> $SYMBOL_LIST
-         echo "kdp_usecount_dec_and_test" >> $SYMBOL_LIST
-         echo "kdp_usecount_inc" >> $SYMBOL_LIST
-
-         if [[ "${{ inputs.branch }}" == "SM-S931B-Oneui8" ]]; then
-           echo "snd_soc_find_dai" >> $SYMBOL_LIST
-           sed -i '
-           /"kernel_aarch64": {/,/},/ {
-           s/"kmi_symbol_list_strict_mode": True/"kmi_symbol_list_strict_mode": False/
-           s/"trim_nonlisted_kmi": True/"trim_nonlisted_kmi": False/
-           }
-           /"kernel_aarch64_16k": {/,/},/ {
-           s/"kmi_symbol_list_strict_mode": True/"kmi_symbol_list_strict_mode": False/
-           s/"trim_nonlisted_kmi": True/"trim_nonlisted_kmi": False/
-           }
-           ' BUILD.bazel
-         fi
-
-         cp "$KERNEL_PATCHES/samsung/min_kdp/min_kdp.c" drivers/min_kdp.c
-         echo "obj-y += min_kdp.o" >> drivers/Makefile         
+        if: inputs.kernel_version == '6.6'
+        uses: ./.github/actions/6.6-fix
+        with:
+          kernel_version: ${{ inputs.kernel_version }}
 
       - name: Add BBG
         if: inputs.bbg == 'true'
