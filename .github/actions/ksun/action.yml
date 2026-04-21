@@ -32,8 +32,8 @@ runs:
     - name: Extract KSU Version Info
       id: ksu-version
       shell: bash
-      working-directory: ${{ github.workspace }}/kernel/KernelSU-Next
       run: |
+        cd "$COMMON/KernelSU-Next"
         # Extract and export KSU version info
         KSU_GIT_VERSION=$(git rev-list --count HEAD 2>/dev/null)
         KSU_GIT_TAG=$(git describe --tags --abbrev=0 2>/dev/null)
