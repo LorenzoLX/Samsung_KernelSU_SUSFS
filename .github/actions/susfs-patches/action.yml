@@ -6,6 +6,10 @@ inputs:
    required: true
   kernel_version:
    description: 'Kernel version (6.1)'
+   required: true
+  branch:
+   description: 'device kernel'
+   required: true
 
 runs:
   using: composite
