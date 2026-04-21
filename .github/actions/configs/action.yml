@@ -85,5 +85,6 @@ runs:
   - name: remove check_defconfig
     shell: bash
     run: |
+     cd "$COMMON"
      # Remove check_defconfig
      sed -i 's/check_defconfig//' ./build.config.gki
