@@ -17,8 +17,8 @@ on:
           - Release
         default: Actions
 
-      wksu:
-        description: "Build with WKSU?"
+      ksun:
+        description: "Build with KSUN?"
         required: false
         default: true
         type: boolean
@@ -75,7 +75,7 @@ jobs:
       bbg: ${{ inputs.bbg }}
       unicodefix: ${{ inputs.unicodefix }}
       zeromount: ${{ inputs.zeromount }}
-      wksu: ${{ inputs.wksu }}
+      ksun: ${{ inputs.ksun }}
       droidspace: ${{ inputs.droidspace }}
       ntsync: ${{ inputs.ntsync }}
       bbr: ${{ inputs.bbr }}
@@ -88,7 +88,7 @@ jobs:
 
     env:
       GH_TOKEN: ${{ github.token }}
-      RELEASE_NAME: "Samsung GKI Kernels With WKSU v3.1.2 & SUSFS v2.1.0"
+      RELEASE_NAME: "Samsung GKI Kernels With KSUN v3.2.0 & SUSFS v2.1.0"
       RELEASE_BODY: ""
     steps:
       - name: Free Disk Space
@@ -141,9 +141,9 @@ jobs:
           Features:
           EOF
 
-          if [ "${{ inputs.wksu }}" = "true" ]; then
+          if [ "${{ inputs.ksun }}" = "true" ]; then
             cat <<'EOF' >> release_body.md
-            -> Wild KSU v3.1.2
+            -> Wild KSU v3.2.0
             EOF
           fi
 
@@ -186,14 +186,14 @@ jobs:
 
           cat <<'EOF' >> release_body.md
           Notes:
-          - The only modifications to Samsung Kernels at this time are WKSU and SUSFS. Everything else is left at default settings.
+          - The only modifications to Samsung Kernels at this time are KSUN and SUSFS. Everything else is left at default settings.
           - Currently no support for KernelPatch-Next for the time being.
           
           Module: 
           -> https://github.com/sidex15/ksu_module_susfs
       
           Managers:
-          -> WKSU: https://github.com/WildKernels/Wild_KSU
+          -> KSUN: https://github.com/KernelSU-Next/KernelSU-Next
           EOF
 
       - name: Create GitHub Release
