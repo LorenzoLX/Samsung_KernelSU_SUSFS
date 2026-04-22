@@ -143,7 +143,7 @@ jobs:
 
           if [ "${{ inputs.ksun }}" = "true" ]; then
             cat <<'EOF' >> release_body.md
-            -> Wild KSU v3.2.0
+            -> KernelSU-Next v3.2.0
             EOF
           fi
 
@@ -184,15 +184,21 @@ jobs:
             EOF
           fi
 
+          if [ "${{ inputs.bbr }}" = "true" ]; then
+            cat <<'EOF' >> release_body.md
+            -> bbrv1
+            EOF
+          fi
+
           cat <<'EOF' >> release_body.md
           Notes:
           - The only modifications to Samsung Kernels at this time are KSUN and SUSFS. Everything else is left at default settings.
-          - Currently no support for KernelPatch-Next for the time being.
+          - Currently no support for KernelPatch-Next/KPM for the time being.
           
           Module: 
           -> https://github.com/sidex15/ksu_module_susfs
       
-          Managers:
+          Manager:
           -> KSUN: https://github.com/KernelSU-Next/KernelSU-Next
           EOF
 
