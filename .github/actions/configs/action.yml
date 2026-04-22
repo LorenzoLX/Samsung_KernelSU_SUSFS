@@ -16,6 +16,7 @@ runs:
      CONFIG_OVERLAY_FS=y
      CONFIG_TMPFS_XATTR=y
      CONFIG_TMPFS_POSIX_ACL=y
+     EOF
 
   - name: increase log buffer size for showing bbg on ksu manager homepage
     shell: bash
