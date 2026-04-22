@@ -36,6 +36,9 @@ on:
       ntsync:
         required: true
         type: string
+      bbr:
+        required: true
+        type: string
 
 jobs:
   build-samsung-gki:
@@ -150,6 +153,10 @@ jobs:
       - name: Add droidspace support
         if: inputs.droidspace == 'true'
         uses: ./.github/actions/droidspaces
+
+      - name: Add bbrv1
+        if: inputs.bbr == 'true'
+        uses: ./.github/actions/bbr
           
       - name: Set Kernel Configuration Variables
         if: inputs.wksu == 'true'
