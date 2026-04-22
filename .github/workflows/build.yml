@@ -27,7 +27,7 @@ on:
       zeromount:
         required: true
         type: string
-      wksu:
+      ksun:
         required: true
         type: string
       droidspace:
@@ -112,7 +112,7 @@ jobs:
           done
 
       - name: Add KernelSU-Next
-        if: inputs.wksu == 'true'
+        if: inputs.ksun == 'true'
         uses: ./.github/actions/ksun
         
       - name: Apply SUSFS Patches
@@ -159,7 +159,7 @@ jobs:
         uses: ./.github/actions/bbr
           
       - name: Set Kernel Configuration Variables
-        if: inputs.wksu == 'true'
+        if: inputs.ksun == 'true'
         uses: ./.github/actions/configs
         with:
          branch: ${{ inputs.branch }}
@@ -178,7 +178,7 @@ jobs:
         uses: ./.github/actions/abi-export
         
       - name: Set file name
-        if: inputs.wksu == 'true'
+        if: inputs.ksun == 'true'
         uses: ./.github/actions/file-name
         with:
          branch: ${{ inputs.branch }}
