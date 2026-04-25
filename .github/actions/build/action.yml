@@ -35,7 +35,7 @@ runs:
        tools/bazel run --nocheck_bzl_visibility --config=stamp --sandbox_debug --verbose_failures --debug_make_verbosity=I //projects/s5e9945:s5e9945_user_dist
      elif [[ ${{ inputs.branch }} == SM-A556* ]]; then
        tools/bazel run --nocheck_bzl_visibility --config=stamp --sandbox_debug --verbose_failures --debug_make_verbosity=I //projects/s5e8845:s5e8845_user_dist
-     elif [[ ${{ inputs.branch }} == SM-A055* || "${{ inputs.branch }}" == "SM-A075M-Oneui7" ]]; then
+     elif [[ ${{ inputs.branch }} == SM-A055* || "${{ inputs.branch }}" == "SM-A075M-Oneui7" || "${{ inputs.branch }}" == "SM-A166B-Oneui7" ]]; then
        chmod +x build_kernel.sh
        ./build_kernel.sh
      fi
