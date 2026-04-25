@@ -19,8 +19,6 @@ runs:
       patch -p1 < "$KERNEL_PATCHES/common/droidspaces/fix_abi_padding_for_posix_mqueue.patch"
      fi
 
-     patch -p1 < "$KERNEL_PATCHES/common/droidspaces/harden_find_task_by_vpid.patch"
-
      cd "$GITHUB_WORKSPACE"
      cat >> "$GKI_DEFCONFIG" << 'EOF'
      # IPC
