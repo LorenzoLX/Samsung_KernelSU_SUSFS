@@ -31,7 +31,7 @@ By flashing this kernel, **YOU** are choosing to make these modifications. If so
 | 📱 **Samsung** | [Samsung_KernelSU_SUSFS](https://github.com/WildKernels/Samsung_KernelSU_SUSFS) | ✅ Active |
 
 ---
-
+<div align="left">
 ## 🔗 Additional Resources
 
 - 🩹 [Kernel Patches](https://github.com/WildKernels/kernel_patches)
@@ -50,7 +50,14 @@ For GKI installation, please follow the official guide:
 ## ✨ Features
 
 - 🔐 **KernelSU**: A root solution for Android GKI devices that works in kernel mode and grants root permission to userspace applications directly in kernel space
-- 🛡️ **SUSFS**: An addon root hiding kernel patches and userspace module for KernelSU
+- 🥷 **SUSFS**: An addon root hiding kernel patches and userspace module for KernelSU
+- 🛡️ **BBG**: LSM-based Baseband Guard security to protect critical device partitions
+- 🖧 **BBRv1**: Improved TCP congestion control
+- ✅ **LTO**: Link Time Optimisation enabled
+- ⚡️ **TMPFS XATTR / POSIX ACL**: Extended TMPFS support for meta modules and Mountify
+- </> **Unicode Bypass Fix**: Prevent path traversal and other detections using non-printable Unicode codepoints [Experimental]
+- 🖥️ **Droidspaces Support**: Support Portable Linux containers to run full Linux environments.
+- 🔃 **NTSync**: Provide high-performance, low-latency synchronization primitives compatible with the Windows NT kernel API
 
 ---
 
@@ -62,6 +69,8 @@ For GKI installation, please follow the official guide:
 | **SUSFS** | simonpunk | [![GitLab](https://img.shields.io/badge/GitLab-simonpunk-orange?style=flat-square&logo=gitlab)](https://gitlab.com/simonpunk/susfs4ksu.git) |
 | **SUSFS Module** | sidex15 | [![GitHub](https://img.shields.io/badge/GitHub-sidex15-blue?style=flat-square&logo=github)](https://github.com/sidex15) |
 | **Sultan Kernels** | kerneltoast | [![GitHub](https://img.shields.io/badge/GitHub-kerneltoast-blue?style=flat-square&logo=github)](https://github.com/kerneltoast) |
+| **Baseband Guard** | vc-teahouse | [![GitHub](https://img.shields.io/badge/GitHub-vc--teahouse-blue?style=flat-square&logo=github)](https://github.com/vc-teahouse/Baseband-guard.git) |
+| **Droidspaces** | ravindu644 | [![GitHub](https://img.shields.io/badge/GitHub-ravindu644-blue?style=flat-square&logo=github)](https://github.com/ravindu644/Droidspaces-OSS.git) |
 
 🙏 Special thanks to the open-source community for their contributions!
 
@@ -120,6 +129,7 @@ Any and all donations are appreciated!
 PayPal: [paypal.me/NgadhnjimHoxha](paypal.me/NgadhnjimHoxha)
 Wise: [wise.com/pay/me/ngadhnjimh](wise.com/pay/me/ngadhnjimh)
 Buy Me A Coffee: [https://buymeacoffee.com/jimsterino98](https://buymeacoffee.com/jimsterino98)
+Ko-fi: [https://ko-fi.com/jimsterino98](https://ko-fi.com/jimsterino98)
 
 DM on telegram for crypto donations!
 
