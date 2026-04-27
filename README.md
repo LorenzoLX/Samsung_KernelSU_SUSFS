@@ -60,7 +60,7 @@ For GKI installation, please follow the official guide:
 - 🔃 **NTSync**: Provide high-performance, low-latency synchronization primitives compatible with the Windows NT kernel API
 
 ---
-
+<div align="center">
 | 🔧 **Project** | 👨‍💻 **Developer** | 🔗 **Link** |
 |:---------------:|:----------------:|:-----------:|
 | **KernelSU** | tiann | [![GitHub](https://img.shields.io/badge/GitHub-tiann-blue?style=flat-square&logo=github)](https://github.com/tiann/KernelSU) |
@@ -75,7 +75,7 @@ For GKI installation, please follow the official guide:
 🙏 Special thanks to the open-source community for their contributions!
 
 ---
-
+<div align="left">
 ## 💬 Support
 
 If you encounter any issues or need help, feel free to:
