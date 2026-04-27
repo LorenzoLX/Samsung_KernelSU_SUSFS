@@ -118,8 +118,8 @@ Flashing this kernel will void your warranty, and there is always a risk of bric
 Any and all donations are appreciated!
 
 PayPal: [paypal.me/NgadhnjimHoxha](paypal.me/NgadhnjimHoxha)
-
 Wise: [wise.com/pay/me/ngadhnjimh](wise.com/pay/me/ngadhnjimh)
+Buy Me A Coffee: [https://buymeacoffee.com/jimsterino98](https://buymeacoffee.com/jimsterino98)
 
 DM on telegram for crypto donations!
 
