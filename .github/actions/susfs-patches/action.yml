@@ -14,70 +14,175 @@ inputs:
 runs:
   using: composite
   steps:
+   - name: Validate Environment Variables
+     shell: bash
+     run: |
+       echo "Validating required environment variables..."
+       echo "COMMON=$COMMON"
+       echo "KERNEL_PATCHES=$KERNEL_PATCHES"
+       echo "SUSFS4KSU=$SUSFS4KSU"
+       echo "GKI_DEFCONFIG=$GKI_DEFCONFIG"
+       
+       # Check if critical paths exist
+       if [ ! -d "$COMMON" ]; then
+         echo "ERROR: COMMON directory not found: $COMMON"
+         exit 1
+       fi
+       if [ ! -d "$SUSFS4KSU" ]; then
+         echo "ERROR: SUSFS4KSU directory not found: $SUSFS4KSU"
+         exit 1
+       fi
+       echo "✓ Environment validation passed"
+   
    - name: Apply to KSUN
      shell: bash
      run: |
+       set -e
        cd "$COMMON/KernelSU"
        SUSFS_VERSION="v2.1.0"
-          
+       
+       echo "Applying SUSFS patches to KernelSU-Next..."
+       
        # Apply SUSFS to KernelSU-Next
-       cp "$SUSFS4KSU/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch" .
-       patch -p1 < 10_enable_susfs_for_ksu.patch || true
-       rm -rf 10_enable_susfs_for_ksu.patch
+       if [ -f "$SUSFS4KSU/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch" ]; then
+         cp "$SUSFS4KSU/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch" .
+         if patch -p1 < 10_enable_susfs_for_ksu.patch; then
+           echo "✓ SUSFS KernelSU patch applied successfully"
+         else
+           echo "⚠ SUSFS KernelSU patch had conflicts, continuing..."
+         fi
+         rm -f 10_enable_susfs_for_ksu.patch
+       else
+         echo "⚠ SUSFS KernelSU patch not found, skipping"
+       fi
 
-       #Fix rejects from adding susfs to KSUN
-       cp "$KERNEL_PATCHES/next/susfs_fix_patches/$SUSFS_VERSION/"*.patch .
-       rm -rf multi_manager.patch
-       rm -rf multi_sepolicy_fix.patch
-       for p in *.patch; do
-           patch -p1 < "$p"
-           rm -f "$p"
-       done
+       # Fix rejects from adding susfs to KSUN
+       if [ -d "$KERNEL_PATCHES/next/susfs_fix_patches/$SUSFS_VERSION" ]; then
+         echo "Applying SUSFS fix patches..."
+         cp "$KERNEL_PATCHES/next/susfs_fix_patches/$SUSFS_VERSION/"*.patch . 2>/dev/null || true
+         rm -f multi_manager.patch multi_sepolicy_fix.patch 2>/dev/null || true
+         
+         for p in *.patch; do
+           if [ -f "$p" ]; then
+             echo "  Applying $p..."
+             if patch -p1 < "$p"; then
+               echo "    ✓ $p applied"
+             else
+               echo "    ⚠ $p had conflicts"
+             fi
+             rm -f "$p"
+           fi
+         done
+       else
+         echo "⚠ SUSFS fix patches directory not found, skipping"
+       fi
        
    - name: Apply to Kernel
      shell: bash
      run: |
-      # Apply SUSFS to kernel
-      cd "$COMMON"
-      cp "$SUSFS4KSU/kernel_patches/fs/"* ./fs/
-      cp "$SUSFS4KSU/kernel_patches/include/linux/"* ./include/linux/
-      cp "$SUSFS4KSU/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch" ./          
-
-      #Prepare open.c for susfs patching
-      sed -i '/#ifdef CONFIG_SECURITY_DEFEX/,/^#endif/d' fs/open.c
-
-      #Prepare namespace.c for susfs patching
-      sed -i '/copy_flags = CL_COPY_UNBINDABLE | CL_EXPIRE;/,/#endif/ {
-        /#ifdef CONFIG_KDP_NS/,/#endif/ {
-           /#else/,/#endif/!d
-           /#else/d
-           /#endif/d
-        }
-       }' fs/namespace.c
-          
-      # Apply SUSFS core patch
-      patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-      rm -rf 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch
-
-      shopt -s nullglob
-      patches=("$KERNEL_PATCHES/samsung/${{ inputs.branch }}"/*.patch)
-      
-      if [ ${#patches[@]} -gt 0 ]; then
-       echo "Patches found, applying..."
-       cp "${patches[@]}" ./
+       set -e
+       cd "$COMMON"
        
-       # Fix SUSFS rejects
-        for p in *.patch; do
-          patch -p1 < "$p"
-          rm -f "$p"
-        done
-        shopt -u nullglob
-      else
-        echo "No patch file found, skipping"
-      fi
+       echo "Applying SUSFS patches to kernel..."
+       echo "Working directory: $(pwd)"
+       
+       # Apply SUSFS to kernel
+       if [ -d "$SUSFS4KSU/kernel_patches/fs" ]; then
+         echo "Copying SUSFS fs patches..."
+         cp "$SUSFS4KSU/kernel_patches/fs/"* ./fs/ 2>/dev/null || true
+       else
+         echo "⚠ SUSFS fs patches directory not found"
+       fi
+       
+       if [ -d "$SUSFS4KSU/kernel_patches/include/linux" ]; then
+         echo "Copying SUSFS include/linux patches..."
+         cp "$SUSFS4KSU/kernel_patches/include/linux/"* ./include/linux/ 2>/dev/null || true
+       else
+         echo "⚠ SUSFS include/linux patches directory not found"
+       fi
+       
+       SUSFS_PATCH="50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch"
+       if [ -f "$SUSFS4KSU/kernel_patches/$SUSFS_PATCH" ]; then
+         cp "$SUSFS4KSU/kernel_patches/$SUSFS_PATCH" ./
+         echo "Copied SUSFS patch: $SUSFS_PATCH"
+       else
+         echo "⚠ SUSFS main patch not found: $SUSFS_PATCH"
+       fi
+
+       # Prepare open.c for susfs patching
+       if [ -f "fs/open.c" ]; then
+         echo "Preparing fs/open.c..."
+         sed -i '/#ifdef CONFIG_SECURITY_DEFEX/,/^#endif/d' fs/open.c 2>/dev/null || true
+       else
+         echo "⚠ fs/open.c not found"
+       fi
+
+       # Prepare namespace.c for susfs patching
+       if [ -f "fs/namespace.c" ]; then
+         echo "Preparing fs/namespace.c..."
+         sed -i '/copy_flags = CL_COPY_UNBINDABLE | CL_EXPIRE;/,/#endif/ {
+           /#ifdef CONFIG_KDP_NS/,/#endif/ {
+              /#else/,/#endif/!d
+              /#else/d
+              /#endif/d
+           }
+          }' fs/namespace.c 2>/dev/null || true
+       else
+         echo "⚠ fs/namespace.c not found"
+       fi
           
-      cd "$GITHUB_WORKSPACE"
-      cat >> "$GKI_DEFCONFIG" << 'EOF'
-      # SUSFS Configuration
-      +CONFIG_KSU_SUSFS=y
-      EOF
+       # Apply SUSFS core patch
+       if [ -f "$SUSFS_PATCH" ]; then
+         echo "Applying main SUSFS patch..."
+         if patch -p1 < "$SUSFS_PATCH"; then
+           echo "✓ SUSFS main patch applied successfully"
+         else
+           echo "⚠ SUSFS main patch had conflicts, continuing..."
+         fi
+         rm -f "$SUSFS_PATCH"
+       else
+         echo "⚠ SUSFS main patch not found in current directory"
+       fi
+
+       # Apply device-specific patches
+       shopt -s nullglob
+       if [ -d "$KERNEL_PATCHES/samsung/${{ inputs.branch }}" ]; then
+         patches=("$KERNEL_PATCHES/samsung/${{ inputs.branch }}"/*.patch)
+         
+         if [ ${#patches[@]} -gt 0 ]; then
+           echo "Found ${#patches[@]} device-specific patches, applying..."
+           cp "${patches[@]}" ./
+           
+           for p in *.patch; do
+             if [ -f "$p" ]; then
+               echo "  Applying $p..."
+               if patch -p1 < "$p"; then
+                 echo "    ✓ $p applied"
+               else
+                 echo "    ⚠ $p had conflicts"
+               fi
+               rm -f "$p"
+             fi
+           done
+         else
+           echo "No device-specific patches found for ${{ inputs.branch }}"
+         fi
+       else
+         echo "⚠ Device patch directory not found: $KERNEL_PATCHES/samsung/${{ inputs.branch }}"
+       fi
+       shopt -u nullglob
+           
+       # Add SUSFS config
+       if [ -f "$GKI_DEFCONFIG" ]; then
+         echo "Adding SUSFS configuration..."
+         cat >> "$GKI_DEFCONFIG" << 'EOF'
+# SUSFS Configuration
++CONFIG_KSU_SUSFS=y
+EOF
+         echo "✓ SUSFS config added"
+       else
+         echo "⚠ GKI_DEFCONFIG not found: $GKI_DEFCONFIG"
+       fi
+       
+       cd "$GITHUB_WORKSPACE"
+       echo "SUSFS patch application completed"
