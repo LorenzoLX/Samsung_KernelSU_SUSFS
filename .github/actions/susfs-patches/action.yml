@@ -17,7 +17,7 @@ runs:
    - name: Apply to KSUN
      shell: bash
      run: |
-       cd "$COMMON/KernelSU-Next"
+       cd "$COMMON/KernelSU"
        SUSFS_VERSION="v2.1.0"
           
        # Apply SUSFS to KernelSU-Next
@@ -79,5 +79,5 @@ runs:
       cd "$GITHUB_WORKSPACE"
       cat >> "$GKI_DEFCONFIG" << 'EOF'
       # SUSFS Configuration
-      CONFIG_KSU_SUSFS=y
+      +CONFIG_KSU_SUSFS=y
       EOF
