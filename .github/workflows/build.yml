@@ -310,6 +310,9 @@ jobs:
       - name: Prepare AnyKernel3
         uses: ./.github/actions/ak3zip-prep
 
+      - name: apply kpm
+        uses: ./.github/actions/kpm
+
       - name: Upload AnyKernel3 Artifacts
         id: upload_ak3
         uses: actions/upload-artifact@v6
