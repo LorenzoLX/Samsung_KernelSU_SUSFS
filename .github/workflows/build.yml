@@ -212,6 +212,8 @@ jobs:
       - name: Add SUSFS
         if: inputs.susfs == 'true'
         uses: ./.github/actions/susfs-patches
+        with:
+          nomount: ${{ inputs.nomount }}
 
       - name: Add Zeromount
         if: inputs.susfs == 'true' && inputs.zeromount == 'true'
