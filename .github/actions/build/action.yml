@@ -25,9 +25,9 @@ runs:
      SCRIPT_LTO=""
 
      # 2. Only populate if explicit modifications are requested
-     if [[ "$LTO" == "thin" || "$LTO" == "full" ]]; then
-       BAZEL_LTO="--lto=$LTO"
-       SCRIPT_LTO="LTO=$LTO"
+     if [[ "$BUILD_LTO" == "thin" || "$BUILD_LTO" == "full" ]]; then
+       BAZEL_LTO="--lto=$BUILD_LTO"
+       SCRIPT_LTO="LTO=$BUILD_LTO"
      fi
 
      if [[ $BRANCH == SM-A055* || $BRANCH == SM-X926B* ]]; then
@@ -61,8 +61,8 @@ runs:
      SCRIPT_LTO=""
 
      # 2. Only populate if explicit modifications are requested
-     if [[ "$LTO" == "thin" || "$LTO" == "full" ]]; then
-       SCRIPT_LTO="LTO=$LTO"
+     if [[ "$BUILD_LTO" == "thin" || "$BUILD_LTO" == "full" ]]; then
+       SCRIPT_LTO="LTO=$BUILD_LTO"
      fi
      
      cd "$CONFIG"
