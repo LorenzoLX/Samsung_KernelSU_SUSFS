@@ -296,7 +296,7 @@ jobs:
         if: inputs.cache == 'true' && inputs.build_type == 'make'
         uses: ./.github/actions/use-ccache
 
-      - name: enable thin LTO
+      - name: configure LTO
         uses: ./.github/actions/lto
         
       - name: Build
