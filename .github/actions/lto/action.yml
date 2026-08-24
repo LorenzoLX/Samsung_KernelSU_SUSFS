@@ -7,13 +7,13 @@ runs:
   - name: configure LTO based on env variable
     shell: bash
     run: |
-     if [[ "$LTO" == "full" ]]; then
+     if [[ "$BUILD_LTO" == "full" ]]; then
       "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --enable CONFIG_LTO_CLANG
       "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --disable CONFIG_LTO_NONE
       "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --disable CONFIG_LTO_CLANG_THIN
       "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --enable CONFIG_LTO_CLANG_FULL
       
-     elif [[ "$LTO" == "thin" ]]; then
+     elif [[ "$BUILD_LTO" == "thin" ]]; then
       "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --enable CONFIG_LTO_CLANG
       "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --disable CONFIG_LTO_NONE
       "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --disable CONFIG_LTO_CLANG_FULL
