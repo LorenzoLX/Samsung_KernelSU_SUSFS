@@ -105,6 +105,12 @@ on:
        default: true
        type: boolean
 
+      kpm:
+       description: "add KPM support"
+       required: false
+       default: true
+       type: boolean
+
 jobs:
 
   build-samsung:
@@ -125,6 +131,7 @@ jobs:
       optimization: ${{ inputs.optimization }}
       ttl: ${{ inputs.ttl }}
       lto: ${{ inputs.lto }}
+      kpm: ${{ inputs.kpm }}
 
   release:
     runs-on: ubuntu-latest
