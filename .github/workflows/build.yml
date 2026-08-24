@@ -51,6 +51,9 @@ on:
       ttl:
         required: true
         type: string
+      lto:
+        required: true
+        type: string
 
 jobs:
   build-samsung-gki:
