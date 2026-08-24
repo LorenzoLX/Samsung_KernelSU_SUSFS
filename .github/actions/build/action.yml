@@ -57,6 +57,14 @@ runs:
     run: |
      set -e
      set -x
+     # 1. Initialize variables as empty (clears them out for "default")
+     SCRIPT_LTO=""
+
+     # 2. Only populate if explicit modifications are requested
+     if [[ "$LTO" == "thin" || "$LTO" == "full" ]]; then
+       SCRIPT_LTO="LTO=$LTO"
+     fi
+     
      cd "$CONFIG"
      if [[ -f build_kernel_GKI.sh ]]; then
       chmod +x build_kernel_GKI.sh
