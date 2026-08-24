@@ -4,10 +4,20 @@ description: samsung seems to have no LTO in their kernels, this enables it
 runs:
  using: composite
  steps:
-  - name: enable FULL LTO
+  - name: configure LTO based on env variable
     shell: bash
     run: |
-     "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --enable CONFIG_LTO_CLANG
-     "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --disable CONFIG_LTO_NONE
-     "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --disable CONFIG_LTO_CLANG_FULL
-     "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --enable CONFIG_LTO_CLANG_THIN
+     if [[ "$LTO" == "full" ]]; then
+      "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --enable CONFIG_LTO_CLANG
+      "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --disable CONFIG_LTO_NONE
+      "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --disable CONFIG_LTO_CLANG_THIN
+      "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --enable CONFIG_LTO_CLANG_FULL
+      
+     elif [[ "$LTO" == "thin" ]]; then
+      "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --enable CONFIG_LTO_CLANG
+      "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --disable CONFIG_LTO_NONE
+      "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --disable CONFIG_LTO_CLANG_FULL
+      "$COMMON/scripts/config" --file "$GKI_DEFCONFIG" --enable CONFIG_LTO_CLANG_THIN
+     else
+      echo "LTO is default, no changes to defconfig"
+     fi
