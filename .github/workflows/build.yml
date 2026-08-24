@@ -73,7 +73,7 @@ jobs:
         run: BRANCH=${{ inputs.branch }} && echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
       - name: Store LTO as env variable
-        run: LTO=${{ inputs.lto }} && echo "LTO=$LTO" >> $GITHUB_ENV
+        run: BUILD_LTO=${{ inputs.lto }} && echo "BUILD_LTO=$BUILD_LTO" >> $GITHUB_ENV
 
       - name: get kernel version before cloning
         uses: ./.github/actions/kernel-info
