@@ -17,6 +17,16 @@ on:
           - Release
         default: Actions
 
+      lto:
+        description: "Choose LTO build"
+        required: true
+        type: choice
+        options:
+          - default
+          - thin
+          - full
+        default: default
+
       ksun:
         description: "KSUN"
         required: false
@@ -114,6 +124,7 @@ jobs:
       ipv6_nat: ${{ inputs.ipv6_nat }}
       optimization: ${{ inputs.optimization }}
       ttl: ${{ inputs.ttl }}
+      lto: ${{ inputs.lto }}
 
   release:
     runs-on: ubuntu-latest
