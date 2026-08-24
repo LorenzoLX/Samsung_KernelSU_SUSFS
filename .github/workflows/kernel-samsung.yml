@@ -46,6 +46,9 @@ on:
       ttl:
         required: true
         type: string
+      lto:
+        required: true
+        type: string
 
 jobs:
   build-kernels-a12:
@@ -192,4 +195,5 @@ jobs:
       ipv6_nat: ${{ inputs.ipv6_nat }}
       optimization: ${{ inputs.optimization }}
       ttl: ${{ inputs.ttl }}
+      lto: ${{ inputs.lto }}
 
