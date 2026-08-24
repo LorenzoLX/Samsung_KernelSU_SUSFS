@@ -8,9 +8,9 @@ runs:
      shell: bash
      run: |
       git clone https://github.com/SukiSU-Ultra/SukiSU_patch.git
-      cp SukiSU_patch/kpm/patch_linux "$ANYKERNEL"
+      cp SukiSU_patch/kpm/patch_linux "$ANYKERNEL3"
       
-      cd "$ANYKERNEL"
+      cd "$ANYKERNEL3"
       chmod +x patch_linux
       ./patch_linux
       echo "KPM patch applied successfully!"
