@@ -8,7 +8,7 @@ runs:
      shell: bash
      run: |
       cd "$COMMON"
-      curl https://raw.githubusercontent.com/maxsteeel/nomount/refs/heads/dev/kernel/setup.sh | bash -s dev
+      curl https://raw.githubusercontent.com/maxsteeel/nomount/refs/heads/dev/kernel/setup.sh | bash -
 
    - name: add to defconfig
      shell: bash
