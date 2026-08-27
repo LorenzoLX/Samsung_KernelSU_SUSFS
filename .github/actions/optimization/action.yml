@@ -12,14 +12,14 @@ runs:
      
      patch -p1 < "$KERNEL_PATCHES/common/optimized_mem_operations.patch"
      patch -p1 < "$KERNEL_PATCHES/common/file_struct_8bytes_align.patch"
-     if [[ $BRANCH != SM-S926* && $BRANCH != SM-A546* && $BRANCH != SM-A356* ]]; then
+     if [[ $BRANCH != SM-S926* && $BRANCH != SM-A546* && $BRANCH != SM-A356* && $BRANCH != SM-S711* ]]; then
      patch -p1 < "$KERNEL_PATCHES/common/reduce_cache_pressure.patch"
      patch -p1 < "$KERNEL_PATCHES/common/mem_opt_prefetch.patch"
      else
      echo "skipping cache pressure and opt prefetch patch for S24 plus"
      fi
 
-     if [[ $BRANCH == SM-A546* || $BRANCH == SM-S926* || $BRANCH == SM-A556* || $BRANCH == SM-M146B* || $BRANCH == SM-S908B* || $BRANCH == SM-A356* ]]; then
+     if [[ $BRANCH == SM-A546* || $BRANCH == SM-S926* || $BRANCH == SM-A556* || $BRANCH == SM-M146B* || $BRANCH == SM-S908B* || $BRANCH == SM-A356* || $BRANCH == SM-S711* ]]; then
       if [ "$(printf '%s\n' "$KERNEL_VER" "$MIN_VERSION" | sort -V | tail -n1)" = "$KERNEL_VER" ]; then
        patch -p1 < "$KERNEL_PATCHES/common/Samsung/optimise_memcmp_exynos.patch"
       elif [ "$(printf '%s\n' "$KERNEL_VER" "5.11" | sort -V | tail -n1)" = "$KERNEL_VER" ]; then
@@ -39,7 +39,7 @@ runs:
 
      sed -i 's/pm_wakeup_event(dev, 2 \* MSEC_PER_SEC);/pm_wakeup_event(dev, ktime_to_ms(min) + 1);/' kernel/time/alarmtimer.c
      patch -p1 < "$KERNEL_PATCHES/common/int_sqrt.patch"
-     if [[ $BRANCH != SM-S926* && $BRANCH != SM-A546* && $BRANCH != SM-A356* ]]; then
+     if [[ $BRANCH != SM-S926* && $BRANCH != SM-A546* && $BRANCH != SM-A356* && $BRANCH != SM-S711* ]]; then
      #patch -p1 < "$KERNEL_PATCHES/common/force_tcp_nodelay.patch"
      patch -p1 < "$KERNEL_PATCHES/common/reduce_gc_thread_sleep_time.patch"
      else
@@ -67,7 +67,7 @@ runs:
      else
       patch -p1 < "$KERNEL_PATCHES/common/avoid_extra_s2idle_wake_attempts.patch"
      fi
-     if [[ $BRANCH != SM-S926* && $BRANCH != SM-A546* && $BRANCH != SM-A356* ]]; then
+     if [[ $BRANCH != SM-S926* && $BRANCH != SM-A546* && $BRANCH != SM-A356* && $BRANCH != SM-S711* ]]; then
      echo "Patching disable_cache_hot_buddy.patch"
      patch -p1 < "$KERNEL_PATCHES/common/disable_cache_hot_buddy.patch"
      else
