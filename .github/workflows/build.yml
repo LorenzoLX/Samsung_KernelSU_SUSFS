@@ -72,11 +72,16 @@ jobs:
       - name: Store branch as env variable
         run: BRANCH=${{ inputs.branch }} && echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
-      - name: Store LTO as env variable
-        run: BUILD_LTO=${{ inputs.lto }} && echo "BUILD_LTO=$BUILD_LTO" >> $GITHUB_ENV
-
       - name: get kernel version before cloning
         uses: ./.github/actions/kernel-info
+
+      - name: Store LTO as env variable
+        run: |
+         if [[ $KERNEL_VER != 6.6 ]]; then
+          BUILD_LTO=${{ inputs.lto }} && echo "BUILD_LTO=$BUILD_LTO" >> $GITHUB_ENV
+         else
+          BUILD_LTO="default" && echo "BUILD_LTO=$BUILD_LTO" >> $GITHUB_ENV
+         fi
         
       - name: Free Disk Space
         if: true
