@@ -257,7 +257,7 @@ jobs:
         uses: ./.github/actions/TTL
 
       - name: add optimization patches
-        if: inputs.optimization == 'true'
+        if: inputs.optimization == 'true' && !startsWith(env.BRANCH, 'SM-S711')
         uses: ./.github/actions/optimization
 
       - name: Fix WiFi and Bluetooth on Samsung 6.6 GKI devices
