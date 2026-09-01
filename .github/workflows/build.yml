@@ -54,9 +54,6 @@ on:
       lto:
         required: true
         type: string
-      kpm:
-        required: true
-        type: string
 
 jobs:
   build-samsung-gki:
@@ -325,10 +322,6 @@ jobs:
           
       - name: Prepare AnyKernel3
         uses: ./.github/actions/ak3zip-prep
-
-      - name: apply kpm
-        if: inputs.kpm == 'true'
-        uses: ./.github/actions/kpm
 
       - name: Upload AnyKernel3 Artifacts
         id: upload_ak3
