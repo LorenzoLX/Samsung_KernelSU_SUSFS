@@ -49,9 +49,6 @@ on:
       lto:
         required: true
         type: string
-      kpm:
-        required: true
-        type: string
 
 jobs:
   build-kernels-a12:
@@ -199,5 +196,4 @@ jobs:
       optimization: ${{ inputs.optimization }}
       ttl: ${{ inputs.ttl }}
       lto: ${{ inputs.lto }}
-      kpm: ${{ inputs.kpm }}
 
