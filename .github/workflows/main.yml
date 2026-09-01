@@ -125,7 +125,6 @@ jobs:
       optimization: ${{ inputs.optimization }}
       ttl: ${{ inputs.ttl }}
       lto: ${{ inputs.lto }}
-      kpm: ${{ inputs.kpm }}
 
   release:
     runs-on: ubuntu-latest
