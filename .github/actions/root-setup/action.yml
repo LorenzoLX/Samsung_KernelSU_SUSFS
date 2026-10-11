@@ -32,7 +32,7 @@ runs:
             repobranch="dev"
             ;;
           resukisu)
-            repo="https://github.com/ReSukiSU/ReSukiSU.git"
+            repo="https://github.com/Baka-SU/BakaSU.git"
             directory="ReSukiSU"
             manager="ReSukiSU Manager"
             repobranch="main"
