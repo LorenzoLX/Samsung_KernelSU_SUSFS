@@ -35,7 +35,7 @@ runs:
             repo="https://github.com/Baka-SU/BakaSU.git"
             directory="ReSukiSU"
             manager="ReSukiSU Manager"
-            repobranch="main"
+            repobranch="sync-up"
             ;;
           *)
             echo "Unsupported root flavor: $flavor" >&2
